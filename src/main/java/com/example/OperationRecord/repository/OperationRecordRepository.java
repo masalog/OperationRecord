@@ -6,11 +6,11 @@ import com.example.OperationRecord.entity.OperationRecordEntity;
 
 public interface OperationRecordRepository {
 
-    OperationRecordEntity save(OperationRecordEntity entity);
+    OperationRecordEntity insert(OperationRecordEntity entity);
 
-    OperationRecordEntity findById(Long id);
+    OperationRecordEntity selectById(Long id);
 
-    List<OperationRecordEntity> findAll();
+    List<OperationRecordEntity> selectAll();
 
     void deleteById(Long id);
 
