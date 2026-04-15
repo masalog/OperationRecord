@@ -35,9 +35,9 @@ class InMemoryOperationRecordRepositoryTest {
                 165.5
         );
 
-        OperationRecordEntity saved = repository.save(entity);
+        OperationRecordEntity saved = repository.insert(entity);
 
-        OperationRecordEntity found = repository.findById(saved.getId());
+        OperationRecordEntity found = repository.selectById(saved.getId());
 
         assertNotNull(found);
         assertEquals(saved.getId(), found.getId());
@@ -46,7 +46,7 @@ class InMemoryOperationRecordRepositoryTest {
     @Test
     void 全件取得できる() {
 
-        repository.save(new OperationRecordEntity(
+        repository.insert(new OperationRecordEntity(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -54,7 +54,7 @@ class InMemoryOperationRecordRepositoryTest {
                 12000, 12100, 165.5
         ));
 
-        repository.save(new OperationRecordEntity(
+        repository.insert(new OperationRecordEntity(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -62,13 +62,13 @@ class InMemoryOperationRecordRepositoryTest {
                 5000, 5200, 150.0
         ));
 
-        assertEquals(2, repository.findAll().size());
+        assertEquals(2, repository.selectAll().size());
     }
 
     @Test
     void 削除したエンティティは取得できない() {
 
-        OperationRecordEntity saved = repository.save(new OperationRecordEntity(
+        OperationRecordEntity saved = repository.insert(new OperationRecordEntity(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -78,13 +78,13 @@ class InMemoryOperationRecordRepositoryTest {
 
         repository.deleteById(saved.getId());
 
-        assertNull(repository.findById(saved.getId()));
+        assertNull(repository.selectById(saved.getId()));
     }
 
     @Test
     void clearで全件削除される() {
 
-        repository.save(new OperationRecordEntity(
+        repository.insert(new OperationRecordEntity(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -92,7 +92,7 @@ class InMemoryOperationRecordRepositoryTest {
                 12000, 12100, 165.5
         ));
 
-        repository.save(new OperationRecordEntity(
+        repository.insert(new OperationRecordEntity(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -102,6 +102,6 @@ class InMemoryOperationRecordRepositoryTest {
 
         repository.clear();
 
-        assertEquals(0, repository.findAll().size());
+        assertEquals(0, repository.selectAll().size());
     }
 }
