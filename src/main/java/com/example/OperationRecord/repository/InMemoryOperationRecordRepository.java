@@ -1,10 +1,11 @@
 package com.example.OperationRecord.repository;
 
 import java.util.*;
-
 import org.springframework.stereotype.Repository;
 
+import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.mapper.OperationRecordMapper;
 
 @Repository
 public class InMemoryOperationRecordRepository implements OperationRecordRepository {
@@ -13,10 +14,12 @@ public class InMemoryOperationRecordRepository implements OperationRecordReposit
     private long sequence = 1L;
 
     @Override
-    public OperationRecordEntity insert(OperationRecordEntity entity) {
+    public OperationRecord save(OperationRecord domain) {
+
+        // Domain → Entity
+        OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
 
         Long id = entity.getId();
-
         if (id == null) {
             id = sequence++;
         }
@@ -34,21 +37,29 @@ public class InMemoryOperationRecordRepository implements OperationRecordReposit
         );
 
         store.put(id, saved);
-        return saved;
+
+        // Entity → Domain
+        return OperationRecordMapper.fromEntityToDomain(saved);
     }
 
     @Override
-    public OperationRecordEntity selectById(Long id) {
-        return store.get(id);
+    public OperationRecord findById(Long id) {
+        OperationRecordEntity entity = store.get(id);
+        if (entity == null) {
+            return null; // 本番では例外にする
+        }
+        return OperationRecordMapper.fromEntityToDomain(entity);
     }
 
     @Override
-    public List<OperationRecordEntity> selectAll() {
-        return new ArrayList<>(store.values());
+    public List<OperationRecord> findAll() {
+        return store.values().stream()
+                .map(OperationRecordMapper::fromEntityToDomain)
+                .toList();
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void remove(Long id) {
         store.remove(id);
     }
 
