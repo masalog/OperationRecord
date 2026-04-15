@@ -13,15 +13,15 @@ class OperationRecordEntityTest {
     void エンティティが正しく生成される() {
 
         OperationRecordEntity entity = new OperationRecordEntity(
-                100L,
-                1L,
-                10L,
+                100L,                     // id
+                1L,                       // vehicleId
+                10L,                      // driverId
                 LocalDate.of(2026, 4, 15),
                 LocalTime.of(9, 0),
                 LocalTime.of(18, 0),
-                "福岡市",
-                "北九州市",
-                65.2
+                12000,                    // startMeter
+                12100,                    // endMeter
+                165.5                     // fuelRate
         );
 
         assertEquals(100L, entity.getId());
@@ -30,10 +30,8 @@ class OperationRecordEntityTest {
         assertEquals(LocalDate.of(2026, 4, 15), entity.getDate());
         assertEquals(LocalTime.of(9, 0), entity.getStartTime());
         assertEquals(LocalTime.of(18, 0), entity.getEndTime());
-        assertEquals("福岡市", entity.getStartLocation());
-        assertEquals("北九州市", entity.getEndLocation());
-        assertEquals(65.2, entity.getDistance());
+        assertEquals(12000, entity.getStartMeter());
+        assertEquals(12100, entity.getEndMeter());
+        assertEquals(165.5, entity.getFuelRate());
     }
 }
-
-
