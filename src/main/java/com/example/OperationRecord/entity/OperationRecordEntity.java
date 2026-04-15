@@ -14,9 +14,9 @@ public class OperationRecordEntity {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String startLocation;
-    private String endLocation;
-    private double distance;
+    private Integer startMeter;
+    private Integer endMeter;
+    private double fuelRate;
 
     public OperationRecordEntity(Long id,
                                  Long vehicleId,
@@ -24,18 +24,18 @@ public class OperationRecordEntity {
                                  LocalDate date,
                                  LocalTime startTime,
                                  LocalTime endTime,
-                                 String startLocation,
-                                 String endLocation,
-                                 double distance) {
+                                 Integer startMeter,
+                                 Integer endMeter,
+                                 double fuelRate) {
         this.id = id;
         this.vehicleId = vehicleId;
         this.driverId = driverId;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
-        this.distance = distance;
+        this.startMeter = startMeter;
+        this.endMeter = endMeter;
+        this.fuelRate = fuelRate;
     }
 
 }
