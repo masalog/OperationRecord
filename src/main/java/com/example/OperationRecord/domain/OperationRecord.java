@@ -15,9 +15,9 @@ public class OperationRecord {
     private final LocalDate date;
     private final LocalTime startTime;
     private final LocalTime endTime;
-    private final String startLocation;
-    private final String endLocation;
-    private final double distance;
+    private final Integer startMeter;
+    private final Integer endMeter;
+    private final Double fuelRate;
 
     public OperationRecord(Long id,
                            Long vehicleId,
@@ -25,24 +25,29 @@ public class OperationRecord {
                            LocalDate date,
                            LocalTime startTime,
                            LocalTime endTime,
-                           String startLocation,
-                           String endLocation,
-                           double distance) {
+                           Integer startMeter,
+                           Integer endMeter,
+                           Double fuelRate) {
 
         Objects.requireNonNull(vehicleId, "vehicleId must not be null");
         Objects.requireNonNull(driverId, "driverId must not be null");
         Objects.requireNonNull(date, "date must not be null");
         Objects.requireNonNull(startTime, "startTime must not be null");
         Objects.requireNonNull(endTime, "endTime must not be null");
-        Objects.requireNonNull(startLocation, "startLocation must not be null");
-        Objects.requireNonNull(endLocation, "endLocation must not be null");
+        Objects.requireNonNull(startMeter, "startMeter must not be null");
+        Objects.requireNonNull(endMeter, "endMeter must not be null");
+        Objects.requireNonNull(fuelRate, "fuelRate must not be null");
 
         if (startTime.isAfter(endTime)) {
             throw new IllegalArgumentException("開始時刻は終了時刻より前でなければならない");
         }
 
-        if (distance < 0) {
-            throw new IllegalArgumentException("距離は0以上でなければならない");
+        if (startMeter < 0 || endMeter < 0) {
+            throw new IllegalArgumentException("メーター値は0以上でなければならない");
+        }
+
+        if (startMeter > endMeter) {
+            throw new IllegalArgumentException("開始メーターは終了メーター以下でなければならない");
         }
 
         this.id = id;
@@ -51,9 +56,13 @@ public class OperationRecord {
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
-        this.distance = distance;
+        this.startMeter = startMeter;
+        this.endMeter = endMeter;
+        this.fuelRate = fuelRate;
+    }
+
+    /** 派生値：走行距離 */
+    public int getDistance() {
+        return endMeter - startMeter;
     }
 }
-

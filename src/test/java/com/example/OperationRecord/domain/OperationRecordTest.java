@@ -20,9 +20,9 @@ class OperationRecordTest {
                 LocalDate.of(2026, 4, 15),
                 LocalTime.of(9, 0),
                 LocalTime.of(18, 0),
-                "福岡市",
-                "北九州市",
-                65.2
+                12000,   // startMeter
+                12100,   // endMeter
+                165.5    // fuelRate
         );
 
         assertEquals(100L, record.getId());
@@ -31,9 +31,10 @@ class OperationRecordTest {
         assertEquals(LocalDate.of(2026, 4, 15), record.getDate());
         assertEquals(LocalTime.of(9, 0), record.getStartTime());
         assertEquals(LocalTime.of(18, 0), record.getEndTime());
-        assertEquals("福岡市", record.getStartLocation());
-        assertEquals("北九州市", record.getEndLocation());
-        assertEquals(65.2, record.getDistance());
+        assertEquals(12000, record.getStartMeter());
+        assertEquals(12100, record.getEndMeter());
+        assertEquals(165.5, record.getFuelRate());
+        assertEquals(100, record.getDistance()); // endMeter - startMeter
     }
 
     @Test
@@ -45,17 +46,17 @@ class OperationRecordTest {
                     1L,
                     10L,
                     LocalDate.of(2026, 4, 15),
-                    LocalTime.of(18, 0),
-                    LocalTime.of(9, 0), // NG
-                    "福岡市",
-                    "北九州市",
-                    65.2
+                    LocalTime.of(18, 0),  // NG
+                    LocalTime.of(9, 0),
+                    12000,
+                    12100,
+                    165.5
             );
         });
     }
 
     @Test
-    void 距離がマイナスなら例外を投げる() {
+    void 開始メーターが終了メーターより大きい場合は例外を投げる() {
 
         assertThrows(IllegalArgumentException.class, () -> {
             new OperationRecord(
@@ -65,10 +66,11 @@ class OperationRecordTest {
                     LocalDate.of(2026, 4, 15),
                     LocalTime.of(9, 0),
                     LocalTime.of(18, 0),
-                    "福岡市",
-                    "北九州市",
-                    -10.0 // NG
+                    13000,   // NG
+                    12100,
+                    165.5
             );
         });
     }
 }
+
