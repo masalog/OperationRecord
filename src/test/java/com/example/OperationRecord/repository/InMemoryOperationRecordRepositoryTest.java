@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.domain.OperationRecord;
 
 class InMemoryOperationRecordRepositoryTest {
 
@@ -17,13 +17,13 @@ class InMemoryOperationRecordRepositoryTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryOperationRecordRepository();
-        repository.clear(); // テストごとに初期化
+        repository.clear();
     }
 
     @Test
-    void 保存したエンティティを取得できる() {
+    void 保存したドメインを取得できる() {
 
-        OperationRecordEntity entity = new OperationRecordEntity(
+        OperationRecord domain = new OperationRecord(
                 null,
                 1L,
                 10L,
@@ -35,9 +35,9 @@ class InMemoryOperationRecordRepositoryTest {
                 165.5
         );
 
-        OperationRecordEntity saved = repository.insert(entity);
+        OperationRecord saved = repository.save(domain);
 
-        OperationRecordEntity found = repository.selectById(saved.getId());
+        OperationRecord found = repository.findById(saved.getId());
 
         assertNotNull(found);
         assertEquals(saved.getId(), found.getId());
@@ -46,7 +46,7 @@ class InMemoryOperationRecordRepositoryTest {
     @Test
     void 全件取得できる() {
 
-        repository.insert(new OperationRecordEntity(
+        repository.save(new OperationRecord(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -54,7 +54,7 @@ class InMemoryOperationRecordRepositoryTest {
                 12000, 12100, 165.5
         ));
 
-        repository.insert(new OperationRecordEntity(
+        repository.save(new OperationRecord(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -62,13 +62,13 @@ class InMemoryOperationRecordRepositoryTest {
                 5000, 5200, 150.0
         ));
 
-        assertEquals(2, repository.selectAll().size());
+        assertEquals(2, repository.findAll().size());
     }
 
     @Test
-    void 削除したエンティティは取得できない() {
+    void 削除したドメインは取得できない() {
 
-        OperationRecordEntity saved = repository.insert(new OperationRecordEntity(
+        OperationRecord saved = repository.save(new OperationRecord(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -76,15 +76,15 @@ class InMemoryOperationRecordRepositoryTest {
                 12000, 12100, 165.5
         ));
 
-        repository.deleteById(saved.getId());
+        repository.remove(saved.getId());
 
-        assertNull(repository.selectById(saved.getId()));
+        assertNull(repository.findById(saved.getId()));
     }
 
     @Test
     void clearで全件削除される() {
 
-        repository.insert(new OperationRecordEntity(
+        repository.save(new OperationRecord(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -92,7 +92,7 @@ class InMemoryOperationRecordRepositoryTest {
                 12000, 12100, 165.5
         ));
 
-        repository.insert(new OperationRecordEntity(
+        repository.save(new OperationRecord(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -102,6 +102,6 @@ class InMemoryOperationRecordRepositoryTest {
 
         repository.clear();
 
-        assertEquals(0, repository.selectAll().size());
+        assertEquals(0, repository.findAll().size());
     }
 }
