@@ -38,9 +38,9 @@ class OperationRecordServiceImplTest {
                 165.5
         );
 
-        OperationRecordEntity saved = service.register(entity);
+        OperationRecordEntity saved = service.regist(entity);
 
-        OperationRecordEntity found = service.find(saved.getId());
+        OperationRecordEntity found = service.findById(saved.getId());
 
         assertNotNull(found);
         assertEquals(saved.getId(), found.getId());
@@ -49,7 +49,7 @@ class OperationRecordServiceImplTest {
     @Test
     void 全件取得できる() {
 
-        service.register(new OperationRecordEntity(
+        service.regist(new OperationRecordEntity(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -57,7 +57,7 @@ class OperationRecordServiceImplTest {
                 12000, 12100, 165.5
         ));
 
-        service.register(new OperationRecordEntity(
+        service.regist(new OperationRecordEntity(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -71,7 +71,7 @@ class OperationRecordServiceImplTest {
     @Test
     void 削除したデータは取得できない() {
 
-        OperationRecordEntity saved = service.register(new OperationRecordEntity(
+        OperationRecordEntity saved = service.regist(new OperationRecordEntity(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -79,8 +79,8 @@ class OperationRecordServiceImplTest {
                 12000, 12100, 165.5
         ));
 
-        service.delete(saved.getId());
+        service.remove(saved.getId());
 
-        assertNull(service.find(saved.getId()));
+        assertNull(service.findById(saved.getId()));
     }
 }

@@ -2,15 +2,18 @@ package com.example.OperationRecord.repository;
 
 import java.util.*;
 
+import org.springframework.stereotype.Repository;
+
 import com.example.OperationRecord.entity.OperationRecordEntity;
 
+@Repository
 public class InMemoryOperationRecordRepository implements OperationRecordRepository {
 
     private final Map<Long, OperationRecordEntity> store = new HashMap<>();
     private long sequence = 1L;
 
     @Override
-    public OperationRecordEntity save(OperationRecordEntity entity) {
+    public OperationRecordEntity insert(OperationRecordEntity entity) {
 
         Long id = entity.getId();
 
@@ -35,12 +38,12 @@ public class InMemoryOperationRecordRepository implements OperationRecordReposit
     }
 
     @Override
-    public OperationRecordEntity findById(Long id) {
+    public OperationRecordEntity selectById(Long id) {
         return store.get(id);
     }
 
     @Override
-    public List<OperationRecordEntity> findAll() {
+    public List<OperationRecordEntity> selectAll() {
         return new ArrayList<>(store.values());
     }
 
