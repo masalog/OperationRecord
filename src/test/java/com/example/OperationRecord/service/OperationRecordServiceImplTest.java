@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.repository.InMemoryOperationRecordRepository;
 
 class OperationRecordServiceImplTest {
@@ -26,7 +26,7 @@ class OperationRecordServiceImplTest {
     @Test
     void 登録したデータを取得できる() {
 
-        OperationRecordEntity entity = new OperationRecordEntity(
+        OperationRecord domain = new OperationRecord(
                 null,
                 1L,
                 10L,
@@ -38,9 +38,9 @@ class OperationRecordServiceImplTest {
                 165.5
         );
 
-        OperationRecordEntity saved = service.regist(entity);
+        OperationRecord saved = service.regist(domain);
 
-        OperationRecordEntity found = service.findById(saved.getId());
+        OperationRecord found = service.findById(saved.getId());
 
         assertNotNull(found);
         assertEquals(saved.getId(), found.getId());
@@ -49,7 +49,7 @@ class OperationRecordServiceImplTest {
     @Test
     void 全件取得できる() {
 
-        service.regist(new OperationRecordEntity(
+        service.regist(new OperationRecord(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),
@@ -57,7 +57,7 @@ class OperationRecordServiceImplTest {
                 12000, 12100, 165.5
         ));
 
-        service.regist(new OperationRecordEntity(
+        service.regist(new OperationRecord(
                 null, 2L, 20L,
                 LocalDate.now(),
                 LocalTime.of(8, 0),
@@ -71,7 +71,7 @@ class OperationRecordServiceImplTest {
     @Test
     void 削除したデータは取得できない() {
 
-        OperationRecordEntity saved = service.regist(new OperationRecordEntity(
+        OperationRecord saved = service.regist(new OperationRecord(
                 null, 1L, 10L,
                 LocalDate.now(),
                 LocalTime.of(9, 0),

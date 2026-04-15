@@ -2,16 +2,17 @@ package com.example.OperationRecord.service;
 
 import java.util.List;
 
-import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.domain.OperationRecord;
 
 public interface OperationRecordService {
 
-    OperationRecordEntity regist(OperationRecordEntity entity);
+    OperationRecord regist(OperationRecord domain);
 
-    OperationRecordEntity findById(Long id);
+    OperationRecord findById(Long id);
 
-    List<OperationRecordEntity> findAll();
+    List<OperationRecord> findAll();
 
     void remove(Long id);
+
 }
 

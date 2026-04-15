@@ -2,16 +2,15 @@ package com.example.OperationRecord.repository;
 
 import java.util.List;
 
-import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.domain.OperationRecord;
 
 public interface OperationRecordRepository {
 
-    OperationRecordEntity insert(OperationRecordEntity entity);
+    OperationRecord save(OperationRecord domain);
 
-    OperationRecordEntity selectById(Long id);
+    OperationRecord findById(Long id);
 
-    List<OperationRecordEntity> selectAll();
+    List<OperationRecord> findAll();
 
-    void deleteById(Long id);
-
+    void remove(Long id);
 }
