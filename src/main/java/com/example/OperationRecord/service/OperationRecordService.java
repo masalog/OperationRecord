@@ -6,12 +6,12 @@ import com.example.OperationRecord.entity.OperationRecordEntity;
 
 public interface OperationRecordService {
 
-    OperationRecordEntity register(OperationRecordEntity entity);
+    OperationRecordEntity regist(OperationRecordEntity entity);
 
-    OperationRecordEntity find(Long id);
+    OperationRecordEntity findById(Long id);
 
     List<OperationRecordEntity> findAll();
 
-    void delete(Long id);
+    void remove(Long id);
 }
 
