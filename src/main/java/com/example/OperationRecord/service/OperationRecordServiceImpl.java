@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.repository.OperationRecordRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,23 +16,22 @@ public class OperationRecordServiceImpl implements OperationRecordService {
     private final OperationRecordRepository repository;
 
     @Override
-    public OperationRecordEntity regist(OperationRecordEntity entity) {
-        return repository.insert(entity);
+    public OperationRecord regist(OperationRecord domain) {
+        return repository.save(domain);
     }
 
     @Override
-    public OperationRecordEntity findById(Long id) {
-        return repository.selectById(id);
+    public OperationRecord findById(Long id) {
+        return repository.findById(id);
     }
 
     @Override
-    public List<OperationRecordEntity> findAll() {
-        return repository.selectAll();
+    public List<OperationRecord> findAll() {
+        return repository.findAll();
     }
 
     @Override
     public void remove(Long id) {
-        repository.deleteById(id);
+        repository.remove(id);
     }
 }
-
