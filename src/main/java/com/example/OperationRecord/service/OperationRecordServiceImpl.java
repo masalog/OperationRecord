@@ -16,22 +16,22 @@ public class OperationRecordServiceImpl implements OperationRecordService {
     private final OperationRecordRepository repository;
 
     @Override
-    public OperationRecordEntity register(OperationRecordEntity entity) {
-        return repository.save(entity);
+    public OperationRecordEntity regist(OperationRecordEntity entity) {
+        return repository.insert(entity);
     }
 
     @Override
-    public OperationRecordEntity find(Long id) {
-        return repository.findById(id);
+    public OperationRecordEntity findById(Long id) {
+        return repository.selectById(id);
     }
 
     @Override
     public List<OperationRecordEntity> findAll() {
-        return repository.findAll();
+        return repository.selectAll();
     }
 
     @Override
-    public void delete(Long id) {
+    public void remove(Long id) {
         repository.deleteById(id);
     }
 }
