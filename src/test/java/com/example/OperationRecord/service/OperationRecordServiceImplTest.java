@@ -2,8 +2,7 @@ package com.example.OperationRecord.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,16 +29,14 @@ class OperationRecordServiceImplTest {
                 null,
                 1L,
                 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000,
                 12100,
                 165.5
         );
 
         OperationRecord saved = service.regist(domain);
-
         OperationRecord found = service.findById(saved.getId());
 
         assertNotNull(found);
@@ -51,17 +48,15 @@ class OperationRecordServiceImplTest {
 
         service.regist(new OperationRecord(
                 null, 1L, 10L,
-                LocalDate.now(),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000, 12100, 165.5
         ));
 
         service.regist(new OperationRecord(
                 null, 2L, 20L,
-                LocalDate.now(),
-                LocalTime.of(8, 0),
-                LocalTime.of(17, 0),
+                LocalDateTime.of(2026, 4, 15, 8, 0),
+                LocalDateTime.of(2026, 4, 15, 17, 0),
                 5000, 5200, 150.0
         ));
 
@@ -73,9 +68,8 @@ class OperationRecordServiceImplTest {
 
         OperationRecord saved = service.regist(new OperationRecord(
                 null, 1L, 10L,
-                LocalDate.now(),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000, 12100, 165.5
         ));
 
@@ -84,3 +78,4 @@ class OperationRecordServiceImplTest {
         assertNull(service.findById(saved.getId()));
     }
 }
+
