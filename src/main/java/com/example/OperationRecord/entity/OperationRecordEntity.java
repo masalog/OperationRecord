@@ -1,7 +1,6 @@
 package com.example.OperationRecord.entity;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,12 +12,10 @@ public class OperationRecordEntity {
     private Long id;
     private Long vehicleId;
     private Long driverId;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
     private Integer startMeter;
     private Integer endMeter;
     private double fuelRate;
-
 }
 
