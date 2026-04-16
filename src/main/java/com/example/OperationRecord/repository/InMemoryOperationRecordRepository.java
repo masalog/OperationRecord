@@ -28,9 +28,8 @@ public class InMemoryOperationRecordRepository implements OperationRecordReposit
                 id,
                 entity.getVehicleId(),
                 entity.getDriverId(),
-                entity.getDate(),
-                entity.getStartTime(),
-                entity.getEndTime(),
+                entity.getStartDateTime(),
+                entity.getEndDateTime(),
                 entity.getStartMeter(),
                 entity.getEndMeter(),
                 entity.getFuelRate()
