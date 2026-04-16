@@ -1,9 +1,8 @@
 package com.example.OperationRecord.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,114 +14,113 @@ import com.example.OperationRecord.entity.OperationRecordEntity;
 class OperationRecordMapperTest {
 
     @Test
-    void ドメインからエンティティに変換できる() {
+    void DomainからEntityへ正しく変換できる() {
+        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
+        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
 
         OperationRecord domain = new OperationRecord(
-                100L,
                 1L,
                 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
-                12000,
-                12100,
-                165.5
+                20L,
+                start,
+                end,
+                1000,
+                1200,
+                5.0
         );
 
         OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
 
-        assertEquals(domain.getId(), entity.getId());
-        assertEquals(domain.getVehicleId(), entity.getVehicleId());
-        assertEquals(domain.getDriverId(), entity.getDriverId());
-        assertEquals(domain.getDate(), entity.getDate());
-        assertEquals(domain.getStartTime(), entity.getStartTime());
-        assertEquals(domain.getEndTime(), entity.getEndTime());
-        assertEquals(domain.getStartMeter(), entity.getStartMeter());
-        assertEquals(domain.getEndMeter(), entity.getEndMeter());
-        assertEquals(domain.getFuelRate(), entity.getFuelRate());
+        assertEquals(1L, entity.getId());
+        assertEquals(10L, entity.getVehicleId());
+        assertEquals(20L, entity.getDriverId());
+        assertEquals(start, entity.getStartDateTime());
+        assertEquals(end, entity.getEndDateTime());
+        assertEquals(1000, entity.getStartMeter());
+        assertEquals(1200, entity.getEndMeter());
+        assertEquals(5.0, entity.getFuelRate());
     }
 
     @Test
-    void エンティティからドメインに変換できる() {
+    void EntityからDomainへ正しく変換できる() {
+        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
+        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
 
         OperationRecordEntity entity = new OperationRecordEntity(
-                100L,
                 1L,
                 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
-                12000,
-                12100,
-                165.5
+                20L,
+                start,
+                end,
+                1000,
+                1200,
+                5.0
         );
 
         OperationRecord domain = OperationRecordMapper.fromEntityToDomain(entity);
 
-        assertEquals(entity.getId(), domain.getId());
-        assertEquals(entity.getVehicleId(), domain.getVehicleId());
-        assertEquals(entity.getDriverId(), domain.getDriverId());
-        assertEquals(entity.getDate(), domain.getDate());
-        assertEquals(entity.getStartTime(), domain.getStartTime());
-        assertEquals(entity.getEndTime(), domain.getEndTime());
-        assertEquals(entity.getStartMeter(), domain.getStartMeter());
-        assertEquals(entity.getEndMeter(), domain.getEndMeter());
-        assertEquals(entity.getFuelRate(), domain.getFuelRate());
+        assertEquals(1L, domain.getId());
+        assertEquals(10L, domain.getVehicleId());
+        assertEquals(20L, domain.getDriverId());
+        assertEquals(start, domain.getStartDateTime());
+        assertEquals(end, domain.getEndDateTime());
+        assertEquals(1000, domain.getStartMeter());
+        assertEquals(1200, domain.getEndMeter());
+        assertEquals(5.0, domain.getFuelRate());
     }
 
     @Test
-    void リクエストDTOからドメインに変換できる() {
+    void RequestからDomainへ正しく変換できる() {
+        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
+        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
 
         OperationRecordRequest request = new OperationRecordRequest(
-                1L,
                 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
-                12000,
-                12100,
-                165.5
+                20L,
+                start,
+                end,
+                1000,
+                1200,
+                5.0
         );
 
         OperationRecord domain = OperationRecordMapper.fromRequestToDomain(request);
 
-        assertEquals(null, domain.getId()); // 新規登録なので null
-        assertEquals(request.getVehicleId(), domain.getVehicleId());
-        assertEquals(request.getDriverId(), domain.getDriverId());
-        assertEquals(request.getDate(), domain.getDate());
-        assertEquals(request.getStartTime(), domain.getStartTime());
-        assertEquals(request.getEndTime(), domain.getEndTime());
-        assertEquals(request.getStartMeter(), domain.getStartMeter());
-        assertEquals(request.getEndMeter(), domain.getEndMeter());
-        assertEquals(request.getFuelRate(), domain.getFuelRate());
+        assertNull(domain.getId()); // 新規登録なので null
+        assertEquals(10L, domain.getVehicleId());
+        assertEquals(20L, domain.getDriverId());
+        assertEquals(start, domain.getStartDateTime());
+        assertEquals(end, domain.getEndDateTime());
+        assertEquals(1000, domain.getStartMeter());
+        assertEquals(1200, domain.getEndMeter());
+        assertEquals(5.0, domain.getFuelRate());
     }
 
     @Test
-    void ドメインからレスポンスDTOに変換できる() {
+    void DomainからResponseへ正しく変換できる() {
+        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
+        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
 
         OperationRecord domain = new OperationRecord(
-                100L,
                 1L,
                 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
-                12000,
-                12100,
-                165.5
+                20L,
+                start,
+                end,
+                1000,
+                1200,
+                5.0
         );
 
         OperationRecordResponse response = OperationRecordMapper.fromDomainToResponse(domain);
 
-        assertEquals(domain.getId(), response.getId());
-        assertEquals(domain.getVehicleId(), response.getVehicleId());
-        assertEquals(domain.getDriverId(), response.getDriverId());
-        assertEquals(domain.getDate(), response.getDate());
-        assertEquals(domain.getStartTime(), response.getStartTime());
-        assertEquals(domain.getEndTime(), response.getEndTime());
-        assertEquals(domain.getStartMeter(), response.getStartMeter());
-        assertEquals(domain.getEndMeter(), response.getEndMeter());
-        assertEquals(domain.getFuelRate(), response.getFuelRate());
+        assertEquals(1L, response.getId());
+        assertEquals(10L, response.getVehicleId());
+        assertEquals(20L, response.getDriverId());
+        assertEquals(start, response.getStartDateTime());
+        assertEquals(end, response.getEndDateTime());
+        assertEquals(1000, response.getStartMeter());
+        assertEquals(1200, response.getEndMeter());
+        assertEquals(5.0, response.getFuelRate());
     }
-
 }
