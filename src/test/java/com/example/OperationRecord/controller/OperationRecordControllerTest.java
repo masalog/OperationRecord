@@ -1,14 +1,13 @@
 package com.example.OperationRecord.controller;
 
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,20 +35,18 @@ class OperationRecordControllerTest {
             {
                 "vehicleId": 1,
                 "driverId": 10,
-                "date": "2026-04-15",
-                "startTime": "09:00",
-                "endTime": "18:00",
+                "startDateTime": "2026-04-15T09:00:00",
+                "endDateTime": "2026-04-15T18:00:00",
                 "startMeter": 12000,
                 "endMeter": 12100,
                 "fuelRate": 165.5
             }
             """;
 
-        var savedDomain = new OperationRecord(
+        OperationRecord savedDomain = new OperationRecord(
                 1L, 1L, 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000, 12100, 165.5
         );
 
@@ -61,17 +58,18 @@ class OperationRecordControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.vehicleId").value(1))
-                .andExpect(jsonPath("$.driverId").value(10));
+                .andExpect(jsonPath("$.driverId").value(10))
+                .andExpect(jsonPath("$.startDateTime").value("2026-04-15T09:00:00"))
+                .andExpect(jsonPath("$.endDateTime").value("2026-04-15T18:00:00"));
     }
 
     @Test
     void GETでID指定取得できる() throws Exception {
 
-        var domain = new OperationRecord(
+        OperationRecord domain = new OperationRecord(
                 1L, 1L, 10L,
-                LocalDate.of(2026, 4, 15),
-                LocalTime.of(9, 0),
-                LocalTime.of(18, 0),
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000, 12100, 165.5
         );
 
@@ -81,6 +79,8 @@ class OperationRecordControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.vehicleId").value(1))
-                .andExpect(jsonPath("$.driverId").value(10));
+                .andExpect(jsonPath("$.driverId").value(10))
+                .andExpect(jsonPath("$.startDateTime").value("2026-04-15T09:00:00"))
+                .andExpect(jsonPath("$.endDateTime").value("2026-04-15T18:00:00"));
     }
 }
