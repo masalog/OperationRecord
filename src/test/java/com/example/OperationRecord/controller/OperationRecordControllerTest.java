@@ -43,7 +43,7 @@ class OperationRecordControllerTest {
             }
             """;
 
-        var savedDomain = new OperationRecord(
+        OperationRecord savedDomain = new OperationRecord(
                 1L, 1L, 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
                 LocalDateTime.of(2026, 4, 15, 18, 0),
@@ -66,7 +66,7 @@ class OperationRecordControllerTest {
     @Test
     void GETでID指定取得できる() throws Exception {
 
-        var domain = new OperationRecord(
+        OperationRecord domain = new OperationRecord(
                 1L, 1L, 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
                 LocalDateTime.of(2026, 4, 15, 18, 0),
