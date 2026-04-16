@@ -1,7 +1,7 @@
 package com.example.OperationRecord.domain;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import lombok.Getter;
@@ -12,9 +12,8 @@ public class OperationRecord {
     private final Long id;
     private final Long vehicleId;
     private final Long driverId;
-    private final LocalDate date;
-    private final LocalTime startTime;
-    private final LocalTime endTime;
+    private final LocalDateTime startDateTime;
+    private final LocalDateTime endDateTime;
     private final Integer startMeter;
     private final Integer endMeter;
     private final Double fuelRate;
@@ -22,26 +21,27 @@ public class OperationRecord {
     public OperationRecord(Long id,
                            Long vehicleId,
                            Long driverId,
-                           LocalDate date,
-                           LocalTime startTime,
-                           LocalTime endTime,
+                           LocalDateTime startDateTime,
+                           LocalDateTime endDateTime,
                            Integer startMeter,
                            Integer endMeter,
                            Double fuelRate) {
 
+        // --- 必須チェック ---
         Objects.requireNonNull(vehicleId, "vehicleId must not be null");
         Objects.requireNonNull(driverId, "driverId must not be null");
-        Objects.requireNonNull(date, "date must not be null");
-        Objects.requireNonNull(startTime, "startTime must not be null");
-        Objects.requireNonNull(endTime, "endTime must not be null");
+        Objects.requireNonNull(startDateTime, "startDateTime must not be null");
+        Objects.requireNonNull(endDateTime, "endDateTime must not be null");
         Objects.requireNonNull(startMeter, "startMeter must not be null");
         Objects.requireNonNull(endMeter, "endMeter must not be null");
         Objects.requireNonNull(fuelRate, "fuelRate must not be null");
 
-        if (startTime.isAfter(endTime)) {
-            throw new IllegalArgumentException("開始時刻は終了時刻より前でなければならない");
+        // --- 日時の整合性チェック ---
+        if (startDateTime.isAfter(endDateTime)) {
+            throw new IllegalArgumentException("開始日時は終了日時より前でなければならない");
         }
 
+        // --- メーター値チェック ---
         if (startMeter < 0 || endMeter < 0) {
             throw new IllegalArgumentException("メーター値は0以上でなければならない");
         }
@@ -53,9 +53,8 @@ public class OperationRecord {
         this.id = id;
         this.vehicleId = vehicleId;
         this.driverId = driverId;
-        this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.startMeter = startMeter;
         this.endMeter = endMeter;
         this.fuelRate = fuelRate;
@@ -65,4 +64,10 @@ public class OperationRecord {
     public int getDistance() {
         return endMeter - startMeter;
     }
+
+    /** 派生値：運行時間（Duration） */
+    public Duration getDuration() {
+        return Duration.between(startDateTime, endDateTime);
+    }
+
 }
