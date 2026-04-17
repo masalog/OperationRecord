@@ -1,5 +1,7 @@
 package com.example.OperationRecord.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.example.OperationRecord.domain.OperationRecord;
@@ -39,4 +41,19 @@ public class OperationRecordController {
 
         return OperationRecordMapper.fromDomainToResponse(domain);
     }
+
+    /** 全件取得 */
+    @GetMapping
+    public List<OperationRecordResponse> getAll() {
+        return service.findAll().stream()
+                .map(OperationRecordMapper::fromDomainToResponse)
+                .toList();
+    }
+
+    /** 削除 */
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.remove(id);
+    }
+
 }
