@@ -1,32 +1,38 @@
 package com.example.OperationRecord.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.service.OperationRecordService;
 
-@WebMvcTest(OperationRecordController.class)
 class OperationRecordControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
     private OperationRecordService service;
+
+    @BeforeEach
+    void setup() {
+        service = Mockito.mock(OperationRecordService.class);
+
+        // ★ コントローラを手動で new して、MockMvc に登録
+        OperationRecordController controller = new OperationRecordController(service);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
 
     @Test
     void POSTで新規登録できる() throws Exception {
@@ -73,9 +79,10 @@ class OperationRecordControllerTest {
                 12000, 12100, 165.5
         );
 
-        when(service.findById(1L)).thenReturn(domain);
+        when(service.findById(anyLong())).thenReturn(domain);
 
-        mockMvc.perform(get("/operation-records/1"))
+        mockMvc.perform(get("/operation-records/1")
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.vehicleId").value(1))
@@ -83,4 +90,5 @@ class OperationRecordControllerTest {
                 .andExpect(jsonPath("$.startDateTime").value("2026-04-15T09:00:00"))
                 .andExpect(jsonPath("$.endDateTime").value("2026-04-15T18:00:00"));
     }
+
 }
