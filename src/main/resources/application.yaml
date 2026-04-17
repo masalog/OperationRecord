@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: operation-record
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -16,14 +19,4 @@ spring:
   sql:
     init:
       mode: always
-
-  cloud:
-    aws:
-      region:
-        static: ${AWS_REGION}
-      credentials:
-        access-key: ${AWS_ACCESS_KEY}
-        secret-key: ${AWS_SECRET_KEY}
-
-  application:
-    name: operation-record
+        
