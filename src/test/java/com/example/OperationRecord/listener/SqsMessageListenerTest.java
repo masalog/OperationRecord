@@ -4,10 +4,11 @@ import com.example.OperationRecord.service.flow.OperationRecordFlowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.PushMessage;
 
 import org.junit.jupiter.api.Test;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class SqsMessageListenerTest {
@@ -40,7 +41,7 @@ public class SqsMessageListenerTest {
         // FlowService が呼ばれたか
         verify(flowService, times(1)).handleInput("U123", "10");
 
-        // LINE返信が呼ばれたか
-        verify(lineClient, times(1)).replyMessage(any(ReplyMessage.class));
+        // LINE返信（pushMessage）が呼ばれたか
+        verify(lineClient, times(1)).pushMessage(any(PushMessage.class));
     }
 }

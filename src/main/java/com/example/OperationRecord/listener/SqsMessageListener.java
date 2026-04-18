@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.PushMessage;
 
 @Slf4j
 @Component
@@ -70,9 +70,9 @@ public class SqsMessageListener {
 
             log.info("FlowService reply: {}", reply);
 
-            // LINE に返信
-            lineMessagingClient.replyMessage(
-                new ReplyMessage(input.getReplyToken(), new TextMessage(reply))
+            // LINE に返信（pushMessage に変更）
+            lineMessagingClient.pushMessage(
+                new PushMessage(input.getUserId(), new TextMessage(reply))
             );
 
             log.info("Reply sent to LINE");
