@@ -8,7 +8,7 @@ import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.dto.OperationRecordRequest;
 import com.example.OperationRecord.dto.OperationRecordResponse;
 import com.example.OperationRecord.mapper.OperationRecordMapper;
-import com.example.OperationRecord.service.OperationRecordService;
+import com.example.OperationRecord.service.operationRecord.OperationRecordService;
 
 import lombok.RequiredArgsConstructor;
 
