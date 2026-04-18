@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.example.OperationRecord.domain.OperationRecord;
-import com.example.OperationRecord.service.OperationRecordService;
+import com.example.OperationRecord.service.operationRecord.OperationRecordService;
 
 class OperationRecordControllerTest {
 
