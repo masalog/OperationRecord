@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.example.OperationRecord.domain.OperationRecord;
-import com.example.OperationRecord.service.OperationRecordService;
+import com.example.OperationRecord.service.operationRecord.OperationRecordService;
 
 class OperationRecordControllerTest {
 
@@ -28,7 +29,6 @@ class OperationRecordControllerTest {
     void setup() {
         service = Mockito.mock(OperationRecordService.class);
 
-        // ★ コントローラを手動で new して、MockMvc に登録
         OperationRecordController controller = new OperationRecordController(service);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -89,6 +89,44 @@ class OperationRecordControllerTest {
                 .andExpect(jsonPath("$.driverId").value(10))
                 .andExpect(jsonPath("$.startDateTime").value("2026-04-15T09:00:00"))
                 .andExpect(jsonPath("$.endDateTime").value("2026-04-15T18:00:00"));
+    }
+
+    @Test
+    void GETで全件取得できる() throws Exception {
+
+        OperationRecord record1 = new OperationRecord(
+                1L, 1L, 10L,
+                LocalDateTime.of(2026, 4, 15, 9, 0),
+                LocalDateTime.of(2026, 4, 15, 18, 0),
+                12000, 12100, 165.5
+        );
+
+        OperationRecord record2 = new OperationRecord(
+                2L, 2L, 20L,
+                LocalDateTime.of(2026, 4, 16, 9, 0),
+                LocalDateTime.of(2026, 4, 16, 18, 0),
+                13000, 13100, 170.0
+        );
+
+        when(service.findAll()).thenReturn(List.of(record1, record2));
+
+        mockMvc.perform(get("/operation-records")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
+    }
+
+    @Test
+    void DELETEで削除できる() throws Exception {
+
+        mockMvc.perform(
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .delete("/operation-records/1")
+        )
+        .andExpect(status().isOk());
+
+        Mockito.verify(service).remove(1L);
     }
 
 }
