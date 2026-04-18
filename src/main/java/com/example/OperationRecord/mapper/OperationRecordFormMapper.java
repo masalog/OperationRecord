@@ -8,8 +8,9 @@ import java.time.format.DateTimeFormatter;
 
 public class OperationRecordFormMapper {
 
+    // ★ ISO-8601対応（DatetimePicker対応）
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     // 全角 → 半角変換して数値化
     private static int toNumber(String text) {
@@ -17,7 +18,7 @@ public class OperationRecordFormMapper {
 
         for (char c : text.toCharArray()) {
             if (c >= '０' && c <= '９') {
-                sb.append((char)(c - '０' + '0'));
+                sb.append((char) (c - '０' + '0'));
             } else {
                 sb.append(c);
             }
@@ -26,7 +27,6 @@ public class OperationRecordFormMapper {
         return Integer.parseInt(sb.toString());
     }
 
-
     public static OperationRecordRequest fromFormToRequest(OperationRecordForm form) {
 
         OperationRecordRequest req = new OperationRecordRequest();
@@ -34,8 +34,13 @@ public class OperationRecordFormMapper {
         req.setDriverId(Long.valueOf(form.getDriverId()));
         req.setVehicleId(Long.valueOf(form.getVehicleId()));
 
-        req.setStartDateTime(LocalDateTime.parse(form.getStartDateTime(), FORMATTER));
-        req.setEndDateTime(LocalDateTime.parse(form.getEndDateTime(), FORMATTER));
+        // ★ DatetimePicker（2026-01-01T10:00）に対応
+        req.setStartDateTime(
+                LocalDateTime.parse(form.getStartDateTime(), FORMATTER)
+        );
+        req.setEndDateTime(
+                LocalDateTime.parse(form.getEndDateTime(), FORMATTER)
+        );
 
         req.setStartMeter(toNumber(form.getStartMeter()));
         req.setEndMeter(toNumber(form.getEndMeter()));
@@ -45,4 +50,3 @@ public class OperationRecordFormMapper {
         return req;
     }
 }
-
