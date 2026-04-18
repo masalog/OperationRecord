@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.OperationRecord.dto.LineInputDto;
 import com.example.OperationRecord.service.flow.OperationRecordFlowService;
+import com.example.OperationRecord.service.flow.OperationRecordStepManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 
 @Slf4j
 @Component
@@ -27,6 +29,7 @@ public class SqsMessageListener {
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
     private final OperationRecordFlowService flowService;
+    private final OperationRecordStepManager stepManager; // ★追加
     private final LineMessagingClient lineMessagingClient;
 
     private final String queueUrl = System.getenv("SQS_QUEUE_URL");
@@ -55,34 +58,66 @@ public class SqsMessageListener {
         }
     }
 
-    // ★ テスト用の入口
+    // テスト用入口
     public void handleMessage(String message) {
         processMessage(message);
     }
 
     private void processMessage(String message) {
         try {
-            // SQS → DTO
             LineInputDto input = mapper.readValue(message, LineInputDto.class);
+            String inputText = pickInputText(input);
 
-            log.info("Received from SQS: userId={}, text={}",
-                    input.getUserId(), input.getText());
+            log.info("Received from SQS: userId={}, inputText={}",
+                    input.getUserId(), inputText);
 
-            // ★ FlowService の戻り値は Message
+            // ===============================
+            // トリガー：会話開始「記録」
+            // ===============================
+            if ("記録".equals(inputText)) {
+                // step を確実に初期化（=1）
+                stepManager.reset(input.getUserId());
+
+                // 最初の案内
+                lineMessagingClient.pushMessage(
+                        new PushMessage(
+                                input.getUserId(),
+                                new TextMessage("車両IDを入力してください")
+                        )
+                );
+                return; // ★ Flow は呼ばない
+            }
+            // ===============================
+
+            if (inputText == null || inputText.isBlank()) {
+                Message fallback =
+                        new TextMessage("入力を受け取れませんでした。もう一度送ってください。");
+                lineMessagingClient.pushMessage(
+                        new PushMessage(input.getUserId(), fallback)
+                );
+                return;
+            }
+
+            // 通常入力はすべて Flow に渡す
             Message reply =
-                    flowService.handleInput(input.getUserId(), input.getText());
+                    flowService.handleInput(input.getUserId(), inputText);
 
-            log.info("FlowService reply message: {}", reply);
-
-            // ★ Message をそのまま LINE に Push
             lineMessagingClient.pushMessage(
-                new PushMessage(input.getUserId(), reply)
+                    new PushMessage(input.getUserId(), reply)
             );
-
-            log.info("Reply sent to LINE");
 
         } catch (Exception e) {
             log.error("Error processing message: {}", message, e);
         }
+    }
+
+    private String pickInputText(LineInputDto input) {
+        if (input.getPostbackDatetime() != null && !input.getPostbackDatetime().isBlank()) {
+            return input.getPostbackDatetime().trim();
+        }
+        if (input.getText() != null && !input.getText().isBlank()) {
+            return input.getText().trim();
+        }
+        return null;
     }
 }

@@ -1,39 +1,61 @@
 package com.example.OperationRecord.listener;
 
 import com.example.OperationRecord.service.flow.OperationRecordFlowService;
+import com.example.OperationRecord.service.flow.OperationRecordStepManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.message.TextMessage;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.concurrent.CompletableFuture;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class SqsMessageListenerTest {
 
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper mapper = 
+        new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private final OperationRecordFlowService flowService = mock(OperationRecordFlowService.class);
-    private final LineMessagingClient lineClient = mock(LineMessagingClient.class);
+    private final OperationRecordFlowService flowService =
+        mock(OperationRecordFlowService.class);
+    
+    private final LineMessagingClient lineClient = 
+        mock(LineMessagingClient.class);
 
-    private final SqsMessageListener listener =
-            new SqsMessageListener(null, mapper, flowService, lineClient);
+    private final OperationRecordStepManager stepManager =
+        mock(OperationRecordStepManager.class);
 
-    @Test
-    void SQSメッセージを処理してFlowServiceとLINE返信が呼ばれる() throws Exception {
+    private SqsMessageListener listener;
 
-        // FlowService の戻り値：String ではなく Message
-        when(flowService.handleInput("U123", "10"))
-                .thenReturn(new TextMessage("OK"));
-
+    @BeforeEach
+    void 準備() {
         // pushMessage は CompletableFuture を返すのでダミーを返しておく（例外回避）
         when(lineClient.pushMessage(any(PushMessage.class)))
                 .thenReturn(CompletableFuture.completedFuture(null));
+
+        listener = new SqsMessageListener(
+            null,
+            mapper,
+            flowService,
+            stepManager,
+            lineClient
+        );
+
+    }
+
+    @Test
+    void 通常メッセージはフロー処理と返信送信が実行される() throws Exception {
+
+        when(flowService.handleInput("U123", "10"))
+                .thenReturn(new TextMessage("OK"));
 
         String json = """
         {
@@ -43,13 +65,38 @@ public class SqsMessageListenerTest {
         }
         """;
 
-        // テスト用の入口
         listener.handleMessage(json);
 
-        // FlowService が呼ばれたか
+        // フロー処理が呼ばれたか
         verify(flowService, times(1)).handleInput("U123", "10");
 
-        // LINE返信（pushMessage）が呼ばれたか
+        // 返信送信（pushMessage）が呼ばれたか
         verify(lineClient, times(1)).pushMessage(any(PushMessage.class));
+    }
+
+    @Test
+    void 記録コマンドは案内のみ送信されフロー処理は実行されない() throws Exception {
+
+        String json = """
+        {
+            "userId": "U999",
+            "text": "記録",
+            "replyToken": "zzzz"
+        }
+        """;
+
+        listener.handleMessage(json);
+
+        // 記録は案内のみなのでフロー処理は呼ばれない
+        verify(flowService, never()).handleInput(anyString(), anyString());
+
+        // pushMessage が1回呼ばれる
+        ArgumentCaptor<PushMessage> captor = ArgumentCaptor.forClass(PushMessage.class);
+        verify(lineClient, times(1)).pushMessage(captor.capture());
+
+        // 送った文言が期待どおりか
+        PushMessage pushed = captor.getValue();
+        TextMessage msg = (TextMessage) pushed.getMessages().get(0);
+        assertEquals("車両IDを入力してください", msg.getText());
     }
 }

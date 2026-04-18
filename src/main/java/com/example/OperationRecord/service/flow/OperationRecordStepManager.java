@@ -1,7 +1,7 @@
 package com.example.OperationRecord.service.flow;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
@@ -11,10 +11,10 @@ import com.example.OperationRecord.dto.OperationRecordForm;
 public class OperationRecordStepManager {
 
     // ユーザーごとの現在ステップ
-    private final Map<String, Integer> stepMap = new HashMap<>();
+    private final Map<String, Integer> stepMap = new ConcurrentHashMap<>();
 
     // ユーザーごとの入力途中フォーム
-    private final Map<String, OperationRecordForm> formMap = new HashMap<>();
+    private final Map<String, OperationRecordForm> formMap = new ConcurrentHashMap<>();
 
     /** 現在のステップを取得（未登録なら1） */
     public int getStep(String userId) {
@@ -36,5 +36,6 @@ public class OperationRecordStepManager {
         stepMap.remove(userId);
         formMap.remove(userId);
     }
+
 }
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.OperationRecord.dto.OperationRecordForm;
 import com.example.OperationRecord.dto.OperationRecordRequest;
-import com.example.OperationRecord.dto.OperationRecordResponse;
 import com.example.OperationRecord.mapper.OperationRecordFormMapper;
 import com.example.OperationRecord.service.application.OperationRecordApplicationService;
 import com.linecorp.bot.model.action.DatetimePickerAction;
@@ -32,57 +31,65 @@ public class OperationRecordFlowServiceImpl implements OperationRecordFlowServic
 
         switch (step) {
 
+            // ① 車両ID（最初の入力）
             case 1 -> {
                 form.setVehicleId(input);
                 stepManager.nextStep(userId);
                 return new TextMessage("運転手IDを入力してください");
             }
 
+            // ② 運転手ID
             case 2 -> {
                 form.setDriverId(input);
                 stepManager.nextStep(userId);
                 return buildStartDatetimePicker();
             }
 
+            // ③ 開始日時
             case 3 -> {
-                // DatetimePicker の postback.params.datetime がここに入る
                 form.setStartDateTime(input);
                 stepManager.nextStep(userId);
                 return buildEndDatetimePicker();
             }
 
+            // ④ 終了日時
             case 4 -> {
                 form.setEndDateTime(input);
                 stepManager.nextStep(userId);
                 return new TextMessage("開始メーターを入力してください");
             }
 
+            // ⑤ 開始メーター
             case 5 -> {
                 form.setStartMeter(input);
                 stepManager.nextStep(userId);
                 return new TextMessage("終了メーターを入力してください");
             }
 
+            // ⑥ 終了メーター
             case 6 -> {
                 form.setEndMeter(input);
                 stepManager.nextStep(userId);
                 return new TextMessage("燃費を入力してください");
             }
 
+            // ⑦ 燃費 → 登録
             case 7 -> {
                 form.setFuelRate(input);
 
+                // ✅ 登録処理
                 OperationRecordRequest request =
-                        OperationRecordFormMapper.fromFormToRequest(form);
+                    OperationRecordFormMapper.fromFormToRequest(form);
+                applicationService.register(request);
 
-                OperationRecordResponse response =
-                        applicationService.register(request);
-
+                // ✅ state を完全にリセット（ここが最重要）
                 stepManager.reset(userId);
 
-                return new TextMessage(
-                    "登録が完了しました（ID: " + response.getId() + "）"
-                );
+                // ✅ 次の行動を明示
+                return new TextMessage("""
+                    登録が完了しました
+                    続けて登録する場合は「記録」と入力してください""");
+                    
             }
 
             default -> {
@@ -95,7 +102,6 @@ public class OperationRecordFlowServiceImpl implements OperationRecordFlowServic
     // --- DatetimePicker builders ---
 
     private Message buildStartDatetimePicker() {
-
         var action =
             DatetimePickerAction.OfLocalDatetime.builder()
                 .label("開始日時を選択")
@@ -113,7 +119,6 @@ public class OperationRecordFlowServiceImpl implements OperationRecordFlowServic
     }
 
     private Message buildEndDatetimePicker() {
-
         var action =
             DatetimePickerAction.OfLocalDatetime.builder()
                 .label("終了日時を選択")
