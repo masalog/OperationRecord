@@ -8,6 +8,8 @@ import com.example.OperationRecord.dto.OperationRecordRequest;
 import com.example.OperationRecord.dto.OperationRecordResponse;
 import com.example.OperationRecord.dto.OperationRecordForm;
 import com.example.OperationRecord.service.application.OperationRecordApplicationService;
+import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 
 class OperationRecordFlowServiceImplTest {
 
@@ -55,6 +57,7 @@ class OperationRecordFlowServiceImplTest {
         }
     }
 
+    // テスト①：ステップ1
     @Test
     void ステップ1で車両IDを受け取り次の質問を返す() {
 
@@ -64,13 +67,24 @@ class OperationRecordFlowServiceImplTest {
         OperationRecordFlowServiceImpl flowService =
                 new OperationRecordFlowServiceImpl(appService, stepManager);
 
-        String result = flowService.handleInput("user1", "10");
+        // ★ 戻り値は Message
+        Message result = flowService.handleInput("user1", "10");
 
-        assertEquals("運転手IDを入力してください", result);
+        // TextMessage が返ってくること
+        assertTrue(result instanceof TextMessage);
+
+        // 中身のテキストを検証
+        assertEquals(
+                "運転手IDを入力してください",
+                ((TextMessage) result).getText()
+        );
+
+        // フォーム・ステップの状態確認
         assertEquals("10", stepManager.getForm("user1").getVehicleId());
         assertTrue(stepManager.nextStepCalled);
     }
 
+    // テスト②：最終ステップ
     @Test
     void 最終ステップで登録処理が呼ばれ登録完了メッセージを返す() {
 
@@ -84,19 +98,23 @@ class OperationRecordFlowServiceImplTest {
         OperationRecordForm form = stepManager.getForm("user1");
         form.setVehicleId("10");
         form.setDriverId("20");
-        form.setStartDateTime("2026-01-01 10:00");
-        form.setEndDateTime("2026-01-01 12:00");
+        form.setStartDateTime("2026-01-01T10:00");
+        form.setEndDateTime("2026-01-01T12:00");
         form.setStartMeter("1000");
         form.setEndMeter("1200");
 
         OperationRecordFlowServiceImpl flowService =
                 new OperationRecordFlowServiceImpl(appService, stepManager);
 
-        String result = flowService.handleInput("user1", "5.0");
+        // ★ 戻り値は Message
+        Message result = flowService.handleInput("user1", "5.0");
 
-        assertTrue(result.contains("登録が完了しました"));
+        assertTrue(result instanceof TextMessage);
+
+        String text = ((TextMessage) result).getText();
+
+        assertTrue(text.contains("登録が完了しました"));
         assertTrue(appService.registerCalled);
         assertTrue(stepManager.resetCalled);
     }
 }
-
