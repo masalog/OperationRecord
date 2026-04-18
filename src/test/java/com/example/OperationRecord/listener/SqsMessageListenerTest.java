@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
+import com.linecorp.bot.model.message.TextMessage;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -24,8 +27,13 @@ public class SqsMessageListenerTest {
     @Test
     void SQSメッセージを処理してFlowServiceとLINE返信が呼ばれる() throws Exception {
 
-        // FlowService の戻り値をモック
-        when(flowService.handleInput("U123", "10")).thenReturn("OK");
+        // FlowService の戻り値：String ではなく Message
+        when(flowService.handleInput("U123", "10"))
+                .thenReturn(new TextMessage("OK"));
+
+        // pushMessage は CompletableFuture を返すのでダミーを返しておく（例外回避）
+        when(lineClient.pushMessage(any(PushMessage.class)))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
         String json = """
         {
