@@ -21,8 +21,6 @@ spring:
       mode: always
 
 line:
-  channel:
-    access:
-      token: ${LINE_CHANNEL_ACCESS_TOKEN}
-    api:
-      reply-url: ${LINE_REPLY_URL}
+  bot:
+    channel-token: ${LINE_CHANNEL_ACCESS_TOKEN}
+
