@@ -5,29 +5,32 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.example.OperationRecord.domain.OperationRecord;
-import com.example.OperationRecord.dto.OperationRecordRequest;
-import com.example.OperationRecord.entity.OperationRecordEntity;
-import com.example.OperationRecord.mapper.OperationRecordMapper;
-import com.example.OperationRecord.repository.OperationRecordJpaRepository;
+import com.example.OperationRecord.dto.LineInputDto;
+import com.example.OperationRecord.service.flow.OperationRecordFlowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.ReplyMessage;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SqsMessageListener {
 
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
-    private final OperationRecordJpaRepository repository;
+    private final OperationRecordFlowService flowService;
+    private final LineMessagingClient lineMessagingClient;
 
     private final String queueUrl = System.getenv("SQS_QUEUE_URL");
 
-    // 5秒ごとに SQS をポーリング
     @Scheduled(fixedDelay = 5000)
     public void pollMessages() {
 
@@ -43,7 +46,6 @@ public class SqsMessageListener {
         for (var msg : messages) {
             processMessage(msg.body());
 
-            // 正常に処理できたら削除
             sqsClient.deleteMessage(DeleteMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .receiptHandle(msg.receiptHandle())
@@ -51,33 +53,32 @@ public class SqsMessageListener {
         }
     }
 
-    // ★ テスト用の public メソッド（入口）
+    // ★★★ テスト用の入口メソッド（これを追加する）
     public void handleMessage(String message) {
         processMessage(message);
     }
 
     private void processMessage(String message) {
         try {
-            // JSON → Request DTO
-            OperationRecordRequest request =
-                    mapper.readValue(message, OperationRecordRequest.class);
+            // SQS → DTO
+            LineInputDto input = mapper.readValue(message, LineInputDto.class);
 
-            // Request → Domain
-            OperationRecord domain =
-                    OperationRecordMapper.fromRequestToDomain(request);
+            log.info("Received from SQS: userId={}, text={}", input.getUserId(), input.getText());
 
-            // Domain → Entity
-            OperationRecordEntity entity =
-                    OperationRecordMapper.fromDomainToEntity(domain);
+            // FlowService を呼ぶ
+            String reply = flowService.handleInput(input.getUserId(), input.getText());
 
-            // DB 保存
-            repository.save(entity);
+            log.info("FlowService reply: {}", reply);
 
-            System.out.println("Saved record: " + entity);
+            // LINE に返信
+            lineMessagingClient.replyMessage(
+                new ReplyMessage(input.getReplyToken(), new TextMessage(reply))
+            );
+
+            log.info("Reply sent to LINE");
 
         } catch (Exception e) {
-            System.err.println("Error processing message: " + message);
-            e.printStackTrace();
+            log.error("Error processing message: {}", message, e);
         }
     }
 }
