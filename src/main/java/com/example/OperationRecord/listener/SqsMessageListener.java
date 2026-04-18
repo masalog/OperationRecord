@@ -16,8 +16,8 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.PushMessage;
+import com.linecorp.bot.model.message.Message;
 
 @Slf4j
 @Component
@@ -46,14 +46,16 @@ public class SqsMessageListener {
         for (var msg : messages) {
             processMessage(msg.body());
 
-            sqsClient.deleteMessage(DeleteMessageRequest.builder()
+            sqsClient.deleteMessage(
+                DeleteMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .receiptHandle(msg.receiptHandle())
-                    .build());
+                    .build()
+            );
         }
     }
 
-    // ★★★ テスト用の入口メソッド（これを追加する）
+    // ★ テスト用の入口
     public void handleMessage(String message) {
         processMessage(message);
     }
@@ -63,16 +65,18 @@ public class SqsMessageListener {
             // SQS → DTO
             LineInputDto input = mapper.readValue(message, LineInputDto.class);
 
-            log.info("Received from SQS: userId={}, text={}", input.getUserId(), input.getText());
+            log.info("Received from SQS: userId={}, text={}",
+                    input.getUserId(), input.getText());
 
-            // FlowService を呼ぶ
-            String reply = flowService.handleInput(input.getUserId(), input.getText());
+            // ★ FlowService の戻り値は Message
+            Message reply =
+                    flowService.handleInput(input.getUserId(), input.getText());
 
-            log.info("FlowService reply: {}", reply);
+            log.info("FlowService reply message: {}", reply);
 
-            // LINE に返信（pushMessage に変更）
+            // ★ Message をそのまま LINE に Push
             lineMessagingClient.pushMessage(
-                new PushMessage(input.getUserId(), new TextMessage(reply))
+                new PushMessage(input.getUserId(), reply)
             );
 
             log.info("Reply sent to LINE");
