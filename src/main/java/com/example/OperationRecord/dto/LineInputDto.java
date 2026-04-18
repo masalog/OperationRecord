@@ -8,4 +8,5 @@ public class LineInputDto {
     private String text;
     private String replyToken;
     private String rawBody;
+    private String postbackDatetime;
 }
