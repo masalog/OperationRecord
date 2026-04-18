@@ -1,56 +1,46 @@
 package com.example.OperationRecord.listener;
 
-import static org.mockito.Mockito.*;
-
-import com.example.OperationRecord.entity.OperationRecordEntity;
-import com.example.OperationRecord.repository.OperationRecordJpaRepository;
+import com.example.OperationRecord.service.flow.OperationRecordFlowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.ReplyMessage;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+
+import static org.mockito.Mockito.*;
 
 public class SqsMessageListenerTest {
 
-    private final ObjectMapper mapper;
-    private final OperationRecordJpaRepository repository = mock(OperationRecordJpaRepository.class);
-    private final SqsMessageListener listener;
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    public SqsMessageListenerTest() {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+    private final OperationRecordFlowService flowService = mock(OperationRecordFlowService.class);
+    private final LineMessagingClient lineClient = mock(LineMessagingClient.class);
 
-        // SqsClient は使わないので null を渡す
-        listener = new SqsMessageListener(null, mapper, repository);
-    }
+    private final SqsMessageListener listener =
+            new SqsMessageListener(null, mapper, flowService, lineClient);
 
     @Test
-    void メッセージを受信してDBに保存できる() throws Exception {
+    void SQSメッセージを処理してFlowServiceとLINE返信が呼ばれる() throws Exception {
+
+        // FlowService の戻り値をモック
+        when(flowService.handleInput("U123", "10")).thenReturn("OK");
 
         String json = """
         {
-            "vehicleId": 1,
-            "driverId": 2,
-            "startDateTime": "2026-04-17T10:00:00",
-            "endDateTime": "2026-04-17T12:00:00",
-            "startMeter": 1000,
-            "endMeter": 1200,
-            "fuelRate": 12.5
+            "userId": "U123",
+            "text": "10",
+            "replyToken": "abcd"
         }
         """;
 
+        // テスト用の入口
         listener.handleMessage(json);
 
-        ArgumentCaptor<OperationRecordEntity> captor =
-                ArgumentCaptor.forClass(OperationRecordEntity.class);
+        // FlowService が呼ばれたか
+        verify(flowService, times(1)).handleInput("U123", "10");
 
-        verify(repository, times(1)).save(captor.capture());
-
-        OperationRecordEntity saved = captor.getValue();
-
-        assert saved.getVehicleId() == 1;
-        assert saved.getDriverId() == 2;
-        assert saved.getStartMeter() == 1000;
-        assert saved.getEndMeter() == 1200;
+        // LINE返信が呼ばれたか
+        verify(lineClient, times(1)).replyMessage(any(ReplyMessage.class));
     }
 }
