@@ -16,8 +16,11 @@ class OperationRecordFormMapperTest {
         OperationRecordForm form = new OperationRecordForm();
         form.setDriverId("1");
         form.setVehicleId("2");
-        form.setStartDateTime("2026-04-18 09:00");
-        form.setEndDateTime("2026-04-18 18:00");
+
+        // ✅ LocalDateTime.parse() が標準で読める ISO-8601 形式（T区切り）に修正
+        form.setStartDateTime("2026-04-18T09:00");
+        form.setEndDateTime("2026-04-18T18:00");
+
         form.setStartMeter("１２３４５"); // 全角
         form.setEndMeter("12350");      // 半角
         form.setFuelRate("8.0");
@@ -33,4 +36,3 @@ class OperationRecordFormMapperTest {
         assertEquals(8.0, req.getFuelRate());
     }
 }
-
