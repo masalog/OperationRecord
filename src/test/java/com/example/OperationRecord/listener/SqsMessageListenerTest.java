@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import software.amazon.awssdk.services.sqs.SqsClient;
+
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,34 +23,38 @@ import static org.mockito.Mockito.*;
 
 public class SqsMessageListenerTest {
 
-    private final ObjectMapper mapper = 
+    private final ObjectMapper mapper =
         new ObjectMapper().registerModule(new JavaTimeModule());
 
     private final OperationRecordFlowService flowService =
         mock(OperationRecordFlowService.class);
-    
-    private final LineMessagingClient lineClient = 
+
+    private final LineMessagingClient lineClient =
         mock(LineMessagingClient.class);
 
     private final OperationRecordStepManager stepManager =
         mock(OperationRecordStepManager.class);
 
+    private final SqsClient sqsClient =
+        mock(SqsClient.class);
+
     private SqsMessageListener listener;
 
     @BeforeEach
     void 準備() {
-        // pushMessage は CompletableFuture を返すのでダミーを返しておく（例外回避）
+        // pushMessage は CompletableFuture を返すのでダミーを返す
         when(lineClient.pushMessage(any(PushMessage.class)))
                 .thenReturn(CompletableFuture.completedFuture(null));
 
+        // ★ 新しいコンストラクタは queueUrl を String で直接渡す
         listener = new SqsMessageListener(
-            null,
+            sqsClient,
             mapper,
             flowService,
             stepManager,
-            lineClient
+            lineClient,
+            "https://example.com/queue-url-for-test"
         );
-
     }
 
     @Test
@@ -72,6 +78,9 @@ public class SqsMessageListenerTest {
 
         // 返信送信（pushMessage）が呼ばれたか
         verify(lineClient, times(1)).pushMessage(any(PushMessage.class));
+
+        // 記録コマンドではないので reset は呼ばれない
+        verify(stepManager, never()).reset(anyString());
     }
 
     @Test
@@ -90,6 +99,9 @@ public class SqsMessageListenerTest {
         // 記録は案内のみなのでフロー処理は呼ばれない
         verify(flowService, never()).handleInput(anyString(), anyString());
 
+        // step 初期化が呼ばれる
+        verify(stepManager, times(1)).reset("U999");
+
         // pushMessage が1回呼ばれる
         ArgumentCaptor<PushMessage> captor = ArgumentCaptor.forClass(PushMessage.class);
         verify(lineClient, times(1)).pushMessage(captor.capture());
@@ -100,3 +112,4 @@ public class SqsMessageListenerTest {
         assertEquals("車両IDを入力してください", msg.getText());
     }
 }
+
