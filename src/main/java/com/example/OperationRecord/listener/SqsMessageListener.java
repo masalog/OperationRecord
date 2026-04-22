@@ -1,7 +1,7 @@
 package com.example.OperationRecord.listener;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,106 +9,130 @@ import com.example.OperationRecord.dto.LineInputDto;
 import com.example.OperationRecord.service.flow.OperationRecordFlowService;
 import com.example.OperationRecord.service.flow.OperationRecordStepManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
-import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
-
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+
 @Slf4j
 @Component
-@RequiredArgsConstructor
+@ConditionalOnProperty(name = "aws.sqs.enabled", havingValue = "true")
 public class SqsMessageListener {
 
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
     private final OperationRecordFlowService flowService;
-    private final OperationRecordStepManager stepManager; // ★追加
+    private final OperationRecordStepManager stepManager;
     private final LineMessagingClient lineMessagingClient;
+    private final String queueUrl;
 
-    private final String queueUrl = System.getenv("SQS_QUEUE_URL");
+    public SqsMessageListener(
+            SqsClient sqsClient,
+            ObjectMapper mapper,
+            OperationRecordFlowService flowService,
+            OperationRecordStepManager stepManager,
+            LineMessagingClient lineMessagingClient,
+            @Value("${SQS_QUEUE_URL}") String queueUrl
+    ) {
+        this.sqsClient = sqsClient;
+        this.mapper = mapper;
+        this.flowService = flowService;
+        this.stepManager = stepManager;
+        this.lineMessagingClient = lineMessagingClient;
 
-    @Scheduled(fixedDelay = 5000)
+        if (queueUrl == null || queueUrl.isBlank()) {
+            throw new IllegalStateException("SQS_QUEUE_URL is not set");
+        }
+        this.queueUrl = queueUrl;
+    }
+
+    @Scheduled(fixedDelayString = "${aws.sqs.poll.delay-ms:5000}")
     public void pollMessages() {
 
-        ReceiveMessageRequest request = ReceiveMessageRequest.builder()
+        var request = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrl)
                 .maxNumberOfMessages(5)
                 .waitTimeSeconds(10)
                 .build();
 
-        List<software.amazon.awssdk.services.sqs.model.Message> messages =
-                sqsClient.receiveMessage(request).messages();
+        var messages = sqsClient.receiveMessage(request).messages();
+        if (messages == null || messages.isEmpty()) return;
 
         for (var msg : messages) {
-            processMessage(msg.body());
+            boolean ok = false;
+            try {
+                ok = processMessage(msg.body());
+            } catch (Exception e) {
+                log.error("Error processing SQS messageId={} body={}", msg.messageId(), msg.body(), e);
+            }
 
-            sqsClient.deleteMessage(
-                DeleteMessageRequest.builder()
-                    .queueUrl(queueUrl)
-                    .receiptHandle(msg.receiptHandle())
-                    .build()
-            );
+            if (ok) {
+                deleteMessage(msg);
+            }
         }
     }
 
-    // テスト用入口
-    public void handleMessage(String message) {
-        processMessage(message);
+    private void deleteMessage(software.amazon.awssdk.services.sqs.model.Message msg) {
+        try {
+            sqsClient.deleteMessage(
+                    DeleteMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .receiptHandle(msg.receiptHandle())
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Failed to delete SQS messageId={}", msg.messageId(), e);
+        }
     }
 
-    private void processMessage(String message) {
+    public boolean handleMessage(String message) {
+        return processMessage(message);
+    }
+
+    private boolean processMessage(String message) {
         try {
-            LineInputDto input = mapper.readValue(message, LineInputDto.class);
-            String inputText = pickInputText(input);
+            var input = mapper.readValue(message, LineInputDto.class);
+            var inputText = pickInputText(input);
 
-            log.info("Received from SQS: userId={}, inputText={}",
-                    input.getUserId(), inputText);
+            log.info("Received from SQS: userId={}, inputText={}", input.getUserId(), inputText);
 
-            // ===============================
-            // トリガー：会話開始「記録」
-            // ===============================
             if ("記録".equals(inputText)) {
-                // step を確実に初期化（=1）
                 stepManager.reset(input.getUserId());
-
-                // 最初の案内
-                lineMessagingClient.pushMessage(
-                        new PushMessage(
-                                input.getUserId(),
-                                new TextMessage("車両IDを入力してください")
-                        )
-                );
-                return; // ★ Flow は呼ばない
+                pushText(input.getUserId(), "車両IDを入力してください");
+                return true;
             }
-            // ===============================
 
             if (inputText == null || inputText.isBlank()) {
-                Message fallback =
-                        new TextMessage("入力を受け取れませんでした。もう一度送ってください。");
-                lineMessagingClient.pushMessage(
-                        new PushMessage(input.getUserId(), fallback)
-                );
-                return;
+                pushText(input.getUserId(), "入力を受け取れませんでした。もう一度送ってください。");
+                return true;
             }
 
-            // 通常入力はすべて Flow に渡す
-            Message reply =
-                    flowService.handleInput(input.getUserId(), inputText);
+            var reply = flowService.handleInput(input.getUserId(), inputText);
+            pushMessage(input.getUserId(), reply);
 
-            lineMessagingClient.pushMessage(
-                    new PushMessage(input.getUserId(), reply)
-            );
+            return true;
 
         } catch (Exception e) {
-            log.error("Error processing message: {}", message, e);
+            log.error("processMessage failed. raw={}", message, e);
+            return false;
         }
+    }
+
+    private void pushText(String userId, String text) {
+        pushMessage(userId, new TextMessage(text));
+    }
+
+    private void pushMessage(String userId, Message message) {
+        lineMessagingClient.pushMessage(new PushMessage(userId, message))
+                .exceptionally(ex -> {
+                    log.error("LINE push failed userId={}", userId, ex);
+                    return null;
+                });
     }
 
     private String pickInputText(LineInputDto input) {
