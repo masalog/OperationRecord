@@ -8,12 +8,14 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        "[format_sql]": false
+        jdbc:
+          "[time_zone]": UTC
 
   sql:
     init:
-      mode: ${SPRING_SQL_INIT_MODE:never}
-      
+      mode: never
