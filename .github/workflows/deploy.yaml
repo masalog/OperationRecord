@@ -1,4 +1,4 @@
-name: Test GitHub Actions OIDC
+name: Build and Push to ECR (dated tag)
 
 on:
   workflow_dispatch:
@@ -7,15 +7,38 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  AWS_REGION: ap-northeast-1
+  ROLE_TO_ASSUME: arn:aws:iam::070938123165:role/GitHub_Actions
+  ECR_REPOSITORY: operation_record_ecs
+
 jobs:
-  test-aws-auth:
+  build-ecr:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Configure AWS credentials
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::070938123165:role/GitHub_Actions
-          aws-region: ap-northeast-1
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Verify identity
-        run: aws sts get-caller-identity
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image (YYYY-MM-DD-run_number-run_attempt)
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          RUN_NO: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          DATE_TAG=$(TZ=Asia/Tokyo date +%F)   # 例: 2026-04-28
+          IMAGE_TAG="${DATE_TAG}-${RUN_NO}-${RUN_ATTEMPT}"  # 例: 2026-04-28-12-1
+          echo "Using tag: ${IMAGE_TAG}"
+
+          docker build -t "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" .
+          docker push "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
