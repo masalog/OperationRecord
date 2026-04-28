@@ -1,4 +1,4 @@
-name: Build, Push to ECR, Deploy to ECS
+name: Test, Build, Push to ECR, Deploy to ECS
 
 on:
   workflow_dispatch:
@@ -20,7 +20,25 @@ env:
   CONTAINER_NAME: operation-record-container
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (for tests)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Run tests (Maven Wrapper)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B test
+
   deploy:
+    needs: test   # ← test が成功した場合のみ deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
