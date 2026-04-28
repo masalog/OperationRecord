@@ -16,7 +16,7 @@ env:
 
   ECS_CLUSTER: operation-record-cluster
   ECS_SERVICE: operation-record-task-service-s88uh1xa
-  ECS_TASK_DEFINITION: .aws/task-definition.json
+  ECS_TASK_DEFINITION_FAMILY: operation-record-task
   CONTAINER_NAME: operation-record-container
 
 jobs:
@@ -43,10 +43,17 @@ jobs:
           docker push "${IMAGE_URI}"
           echo "image=${IMAGE_URI}" >> $GITHUB_OUTPUT
 
+      - name: Fetch current task definition (JSON)
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "${ECS_TASK_DEFINITION_FAMILY}" \
+            --query taskDefinition \
+            --output json > task-definition.json
+
       - id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
