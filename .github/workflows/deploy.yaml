@@ -1,4 +1,4 @@
-name: Build and Push to ECR (dated tag)
+name: Build, Push to ECR, Deploy to ECS
 
 on:
   workflow_dispatch:
@@ -8,37 +8,51 @@ permissions:
   id-token: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   AWS_REGION: ap-northeast-1
   ROLE_TO_ASSUME: arn:aws:iam::070938123165:role/GitHub_Actions
+
   ECR_REPOSITORY: operation_record_ecs
 
+  ECS_CLUSTER: operation-record-cluster
+  ECS_SERVICE: operation-record-task-service-s88uh1xa
+  ECS_TASK_DEFINITION: .aws/task-definition.json
+  CONTAINER_NAME: operation-record-container
+
 jobs:
-  build-ecr:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
+      - id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push Docker image (YYYY-MM-DD-run_number-run_attempt)
+      - id: build-image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          RUN_NO: ${{ github.run_number }}
-          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
-          DATE_TAG=$(TZ=Asia/Tokyo date +%F)   # 例: 2026-04-28
-          IMAGE_TAG="${DATE_TAG}-${RUN_NO}-${RUN_ATTEMPT}"  # 例: 2026-04-28-12-1
-          echo "Using tag: ${IMAGE_TAG}"
+          IMAGE_TAG=$(TZ=Asia/Tokyo date +'%Y-%m-%d-%H-%M-%S')
+          IMAGE_URI="${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+          echo "image=${IMAGE_URI}" >> $GITHUB_OUTPUT
 
-          docker build -t "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" .
-          docker push "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+      - id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
