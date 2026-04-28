@@ -1,0 +1,21 @@
+name: Test GitHub Actions OIDC
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-aws-auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::070938123165:role/GitHub_Actions
+          aws-region: ap-northeast-1
+
+      - name: Verify identity
+        run: aws sts get-caller-identity
