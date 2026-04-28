@@ -3,6 +3,10 @@ name: Test, Build, Push to ECR, Deploy to ECS
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -38,7 +42,7 @@ jobs:
           ./mvnw -B test
 
   deploy:
-    needs: test   # ← test が成功した場合のみ deploy
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
