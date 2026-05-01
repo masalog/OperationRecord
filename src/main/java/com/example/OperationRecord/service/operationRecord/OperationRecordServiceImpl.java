@@ -31,6 +31,19 @@ public class OperationRecordServiceImpl implements OperationRecordService {
     }
 
     @Override
+    public OperationRecord update(OperationRecord domain) {
+
+        // Domain → Entity
+        OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
+
+        // DB 更新（save は update も兼ねる）
+        OperationRecordEntity saved = repository.save(entity);
+
+        // Entity → Domain
+        return OperationRecordMapper.fromEntityToDomain(saved);
+    }
+
+    @Override
     public OperationRecord findById(Long id) {
         return repository.findById(id)
                 .map(OperationRecordMapper::fromEntityToDomain)
