@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.dto.OperationRecordRequest;
 import com.example.OperationRecord.dto.OperationRecordResponse;
-import com.example.OperationRecord.service.operationRecord.OperationRecordService;
 
 class OperationRecordApplicationServiceImplTest {
 
@@ -31,6 +30,11 @@ class OperationRecordApplicationServiceImplTest {
                         domain.getEndMeter(),
                         domain.getFuelRate()
                 );
+            }
+
+            @Override
+            public OperationRecord update(OperationRecord domain) {
+                return domain;
             }
 
             @Override

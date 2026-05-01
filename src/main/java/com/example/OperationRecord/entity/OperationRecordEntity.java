@@ -32,15 +32,15 @@ public class OperationRecordEntity {
     @Column(name = "start_date_time", nullable = false)
     private LocalDateTime startDateTime;
 
-    @Column(name = "end_date_time", nullable = false)
+    @Column(name = "end_date_time", nullable = true)   // ← 修正
     private LocalDateTime endDateTime;
 
     @Column(name = "start_meter", nullable = false)
     private Integer startMeter;
 
-    @Column(name = "end_meter", nullable = false)
+    @Column(name = "end_meter", nullable = true)       // ← 修正
     private Integer endMeter;
 
-    @Column(name = "fuel_rate", nullable = false)
+    @Column(name = "fuel_rate", nullable = true)       // ← 修正
     private Double fuelRate;
 }

@@ -1,4 +1,4 @@
-package com.example.OperationRecord.service.operationRecord;
+package com.example.OperationRecord.service.application;
 
 import java.util.List;
 
@@ -7,6 +7,8 @@ import com.example.OperationRecord.domain.OperationRecord;
 public interface OperationRecordService {
 
     OperationRecord regist(OperationRecord domain);
+
+    OperationRecord update(OperationRecord domain);
 
     OperationRecord findById(Long id);
 

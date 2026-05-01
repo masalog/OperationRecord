@@ -1,4 +1,4 @@
-package com.example.OperationRecord.service.operationRecord;
+package com.example.OperationRecord.service.application;
 
 import java.util.List;
 
@@ -24,6 +24,19 @@ public class OperationRecordServiceImpl implements OperationRecordService {
         OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
 
         // DB 保存
+        OperationRecordEntity saved = repository.save(entity);
+
+        // Entity → Domain
+        return OperationRecordMapper.fromEntityToDomain(saved);
+    }
+
+    @Override
+    public OperationRecord update(OperationRecord domain) {
+
+        // Domain → Entity
+        OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
+
+        // DB 更新（save は update も兼ねる）
         OperationRecordEntity saved = repository.save(entity);
 
         // Entity → Domain
