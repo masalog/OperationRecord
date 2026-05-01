@@ -8,6 +8,8 @@ public interface OperationRecordService {
 
     OperationRecord regist(OperationRecord domain);
 
+    OperationRecord update(OperationRecord domain);
+
     OperationRecord findById(Long id);
 
     List<OperationRecord> findAll();
