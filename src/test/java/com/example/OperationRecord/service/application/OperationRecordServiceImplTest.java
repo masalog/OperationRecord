@@ -17,7 +17,6 @@ import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
 import com.example.OperationRecord.mapper.OperationRecordMapper;
 import com.example.OperationRecord.repository.OperationRecordJpaRepository;
-import com.example.OperationRecord.service.application.OperationRecordServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class OperationRecordServiceImplTest {
