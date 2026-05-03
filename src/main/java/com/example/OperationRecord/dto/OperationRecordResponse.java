@@ -18,6 +18,5 @@ public class OperationRecordResponse {
     private LocalDateTime endDateTime;
     private Integer startMeter;
     private Integer endMeter;
-    private Double fuelRate;
 
 }
