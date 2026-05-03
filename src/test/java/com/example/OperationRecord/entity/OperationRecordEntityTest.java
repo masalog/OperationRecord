@@ -9,33 +9,7 @@ import org.junit.jupiter.api.Test;
 class OperationRecordEntityTest {
 
     @Test
-    void 全てのフィールドに値を設定した場合に正しく保持される() {
-        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2026, 1, 1, 12, 0);
-
-        OperationRecordEntity entity = new OperationRecordEntity(
-                1L,
-                10L,
-                20L,
-                start,
-                end,
-                1000,
-                1200,
-                5.0
-        );
-
-        assertEquals(1L, entity.getId());
-        assertEquals(10L, entity.getVehicleId());
-        assertEquals(20L, entity.getDriverId());
-        assertEquals(start, entity.getStartDateTime());
-        assertEquals(end, entity.getEndDateTime());
-        assertEquals(1000, entity.getStartMeter());
-        assertEquals(1200, entity.getEndMeter());
-        assertEquals(5.0, entity.getFuelRate());
-    }
-
-    @Test
-    void null許容フィールドがnullでも生成できる() {
+    void 前半データのみでも生成できて値を保持する() {
         LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
 
         OperationRecordEntity entity = new OperationRecordEntity(
@@ -43,10 +17,9 @@ class OperationRecordEntityTest {
                 10L,
                 20L,
                 start,
-                null,   // endDateTime
+                null,   // endDateTime（後半未入力）
                 1000,
-                null,   // endMeter
-                null    // fuelRate
+                null    // endMeter（後半未入力）
         );
 
         assertEquals(1L, entity.getId());
@@ -56,6 +29,24 @@ class OperationRecordEntityTest {
         assertNull(entity.getEndDateTime());
         assertEquals(1000, entity.getStartMeter());
         assertNull(entity.getEndMeter());
-        assertNull(entity.getFuelRate());
+    }
+
+    @Test
+    void 後半データが揃っている場合も正しく保持する() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+        LocalDateTime end   = LocalDateTime.of(2026, 1, 1, 12, 0);
+
+        OperationRecordEntity entity = new OperationRecordEntity(
+                1L,
+                10L,
+                20L,
+                start,
+                end,
+                1000,
+                1200
+        );
+
+        assertEquals(end, entity.getEndDateTime());
+        assertEquals(1200, entity.getEndMeter());
     }
 }

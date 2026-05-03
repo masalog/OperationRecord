@@ -10,20 +10,19 @@ import org.junit.jupiter.api.Test;
 class OperationRecordTest {
 
     @Test
-    void 前半保存_終了情報がnullでも生成できる() {
+    void 前半生成_必須項目だけで生成できる() {
         OperationRecord record = new OperationRecord(
                 1L,
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 10, 0),
-                null,      // endDateTime
-                1000,
-                null,      // endMeter
-                null       // fuelRate
+                1000     // startMeter（前半必須）
         );
 
         assertEquals(0, record.getDistance());
         assertEquals(Duration.ZERO, record.getDuration());
+        assertNull(record.getEndDateTime());
+        assertNull(record.getEndMeter());
     }
 
     @Test
@@ -33,20 +32,17 @@ class OperationRecordTest {
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 10, 0),
-                null,
-                1000,
-                null,
-                null
+                1000
         );
 
         record.updateEndInfo(
                 LocalDateTime.of(2026, 1, 1, 12, 0),
-                1200,
-                5.0
+                1200
         );
 
         assertEquals(200, record.getDistance());
         assertEquals(Duration.ofHours(2), record.getDuration());
+        assertEquals(1200, record.getEndMeter());
     }
 
     @Test
@@ -56,17 +52,13 @@ class OperationRecordTest {
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 12, 0),
-                null,
-                1000,
-                null,
-                null
+                1000
         );
 
         assertThrows(IllegalArgumentException.class, () -> {
             record.updateEndInfo(
                     LocalDateTime.of(2026, 1, 1, 10, 0),
-                    1100,
-                    5.0
+                    1100
             );
         });
     }
@@ -78,33 +70,26 @@ class OperationRecordTest {
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 10, 0),
-                null,
-                1200,
-                null,
-                null
+                1200
         );
 
         assertThrows(IllegalArgumentException.class, () -> {
             record.updateEndInfo(
                     LocalDateTime.of(2026, 1, 1, 12, 0),
-                    1100,
-                    5.0
+                    1100
             );
         });
     }
 
     @Test
-    void 必須項目がnullなら例外() {
+    void 前半生成_必須項目がnullなら例外() {
         assertThrows(NullPointerException.class, () -> {
             new OperationRecord(
                     1L,
                     null, // vehicleId
                     20L,
                     LocalDateTime.now(),
-                    null,
-                    1000,
-                    null,
-                    null
+                    1000
             );
         });
     }

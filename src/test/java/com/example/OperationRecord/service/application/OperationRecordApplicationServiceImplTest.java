@@ -14,21 +14,20 @@ import com.example.OperationRecord.dto.OperationRecordResponse;
 class OperationRecordApplicationServiceImplTest {
 
     @Test
-    void 登録処理が実行されレスポンスが返る() {
+    void 新規登録すると運行記録がID付きで返る() {
 
         // フェイクのドメインサービス
         OperationRecordService fakeService = new OperationRecordService() {
+
             @Override
             public OperationRecord regist(OperationRecord domain) {
+                // 登録後は ID が採番される想定
                 return new OperationRecord(
                         1L,
                         domain.getVehicleId(),
                         domain.getDriverId(),
                         domain.getStartDateTime(),
-                        domain.getEndDateTime(),
-                        domain.getStartMeter(),
-                        domain.getEndMeter(),
-                        domain.getFuelRate()
+                        domain.getStartMeter()
                 );
             }
 
@@ -52,20 +51,20 @@ class OperationRecordApplicationServiceImplTest {
             }
         };
 
-        OperationRecordApplicationServiceImpl app =
+        OperationRecordApplicationServiceImpl applicationService =
                 new OperationRecordApplicationServiceImpl(fakeService);
 
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
+        // 前半登録リクエスト
+        OperationRecordRequest request = new OperationRecordRequest();
+        request.setOperationRecordId(null); // 新規登録
+        request.setVehicleId(10L);
+        request.setDriverId(20L);
+        request.setStartDateTime(LocalDateTime.of(2026, 1, 1, 10, 0));
+        request.setStartMeter(1000);
 
-        OperationRecordRequest request = new OperationRecordRequest(
-                10L, 20L, start, end, 1000, 1200, 5.0
-        );
-
-        OperationRecordResponse response = app.register(request);
+        OperationRecordResponse response =
+                applicationService.register(request);
 
         assertEquals(1L, response.getId());
     }
 }
-
-
