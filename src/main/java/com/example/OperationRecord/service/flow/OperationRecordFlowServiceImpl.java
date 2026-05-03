@@ -20,80 +20,95 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OperationRecordFlowServiceImpl implements OperationRecordFlowService {
 
+    private static final String RETURN_TRIGGER = "帰還";
+
     private final OperationRecordApplicationService applicationService;
     private final OperationRecordStepManager stepManager;
 
     @Override
     public Message handleInput(String userId, String input) {
 
-        int step = stepManager.getStep(userId);
-        OperationRecordForm form = stepManager.getForm(userId);
+        int step = stepManager.getCurrentOperationInputStep(userId);
+        OperationRecordForm form = stepManager.getOrCreateOperationInputForm(userId);
 
         switch (step) {
 
-            // ① 車両ID（最初の入力）
+            // ① 車両ID
             case 1 -> {
                 form.setVehicleId(input);
-                stepManager.nextStep(userId);
+                stepManager.advanceOperationInputStep(userId);
                 return new TextMessage("運転手IDを入力してください");
             }
 
             // ② 運転手ID
             case 2 -> {
                 form.setDriverId(input);
-                stepManager.nextStep(userId);
+                stepManager.advanceOperationInputStep(userId);
                 return buildStartDatetimePicker();
             }
 
-            // ③ 開始日時
+            // ③ 開始日時 → 次は開始メーター
             case 3 -> {
                 form.setStartDateTime(input);
-                stepManager.nextStep(userId);
-                return buildEndDatetimePicker();
-            }
-
-            // ④ 終了日時
-            case 4 -> {
-                form.setEndDateTime(input);
-                stepManager.nextStep(userId);
+                stepManager.advanceOperationInputStep(userId); // 3 -> 4
                 return new TextMessage("開始メーターを入力してください");
             }
 
-            // ⑤ 開始メーター
-            case 5 -> {
+            // ④ 開始メーター → ★前半保存(register) → ★待機へ
+            case 4 -> {
                 form.setStartMeter(input);
-                stepManager.nextStep(userId);
+
+                OperationRecordRequest request = OperationRecordFormMapper.toRegisterRequest(form);
+                var response = applicationService.register(request);
+
+                stepManager.storeSavedOperationRecordId(userId, response.getId());
+                stepManager.advanceOperationInputStep(userId); // 4 -> 5
+
+                return new TextMessage("""
+                        出庫前の入力が完了しました。
+                        帰還時に「帰還」と入力して続きを登録してください。
+                        """);
+            }
+
+            // ⑤ 待機（帰還トリガー待ち）
+            case 5 -> {
+                if (!RETURN_TRIGGER.equals(input.trim())) {
+                    return new TextMessage("""
+                            現在、帰還入力待ちです。
+                            帰還したら「帰還」と入力してください。
+                            """);
+                }
+
+                stepManager.advanceOperationInputStep(userId); // 5 -> 6
+                return buildEndDatetimePicker();
+            }
+
+            // ⑥ 終了日時
+            case 6 -> {
+                form.setEndDateTime(input);
+                stepManager.advanceOperationInputStep(userId); // 6 -> 7
                 return new TextMessage("終了メーターを入力してください");
             }
 
-            // ⑥ 終了メーター
-            case 6 -> {
-                form.setEndMeter(input);
-                stepManager.nextStep(userId);
-                return new TextMessage("燃費を入力してください");
-            }
-
-            // ⑦ 燃費 → 登録
+            // ⑦ 終了メーター → ★後半更新(update) → 完了
             case 7 -> {
-                form.setFuelRate(input);
+                form.setEndMeter(input);
 
-                // ✅ 登録処理
-                OperationRecordRequest request =
-                    OperationRecordFormMapper.fromFormToRequest(form);
-                applicationService.register(request);
+                Long savedId = stepManager.getSavedOperationRecordId(userId);
+                OperationRecordRequest request = OperationRecordFormMapper.toUpdateRequest(form, savedId);
 
-                // ✅ state を完全にリセット（ここが最重要）
-                stepManager.reset(userId);
+                applicationService.update(request);
 
-                // ✅ 次の行動を明示
+                stepManager.resetOperationInputState(userId);
+
                 return new TextMessage("""
-                    登録が完了しました
-                    続けて登録する場合は「記録」と入力してください""");
-                    
+                        登録が完了しました。
+                        続けて登録する場合は「記録」と入力してください。
+                        """);
             }
 
             default -> {
-                stepManager.reset(userId);
+                stepManager.resetOperationInputState(userId);
                 return new TextMessage("エラーが発生しました。最初からやり直してください。");
             }
         }
@@ -103,16 +118,16 @@ public class OperationRecordFlowServiceImpl implements OperationRecordFlowServic
 
     private Message buildStartDatetimePicker() {
         var action =
-            DatetimePickerAction.OfLocalDatetime.builder()
-                .label("開始日時を選択")
-                .data("action=startDateTime")
-                .build();
+                DatetimePickerAction.OfLocalDatetime.builder()
+                        .label("開始日時を選択")
+                        .data("action=startDateTime")
+                        .build();
 
         var template = new ButtonsTemplate(
-            null,
-            "開始日時",
-            "開始日時を選択してください",
-            List.of(action)
+                null,
+                "開始日時",
+                "開始日時を選択してください",
+                List.of(action)
         );
 
         return new TemplateMessage("開始日時を選択してください", template);
@@ -120,16 +135,16 @@ public class OperationRecordFlowServiceImpl implements OperationRecordFlowServic
 
     private Message buildEndDatetimePicker() {
         var action =
-            DatetimePickerAction.OfLocalDatetime.builder()
-                .label("終了日時を選択")
-                .data("action=endDateTime")
-                .build();
+                DatetimePickerAction.OfLocalDatetime.builder()
+                        .label("終了日時を選択")
+                        .data("action=endDateTime")
+                        .build();
 
         var template = new ButtonsTemplate(
-            null,
-            "終了日時",
-            "終了日時を選択してください",
-            List.of(action)
+                null,
+                "終了日時",
+                "終了日時を選択してください",
+                List.of(action)
         );
 
         return new TemplateMessage("終了日時を選択してください", template);
