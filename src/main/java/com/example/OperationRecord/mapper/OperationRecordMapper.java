@@ -16,37 +16,40 @@ public class OperationRecordMapper {
                 domain.getStartDateTime(),
                 domain.getEndDateTime(),
                 domain.getStartMeter(),
-                domain.getEndMeter(),
-                domain.getFuelRate()
+                domain.getEndMeter()
         );
     }
 
     /** Entity → Domain */
     public static OperationRecord fromEntityToDomain(OperationRecordEntity entity) {
-        return new OperationRecord(
+        OperationRecord domain = new OperationRecord(
                 entity.getId(),
                 entity.getVehicleId(),
                 entity.getDriverId(),
                 entity.getStartDateTime(),
-                entity.getEndDateTime(),
-                entity.getStartMeter(),
-                entity.getEndMeter(),
-                entity.getFuelRate()
+                entity.getStartMeter()
         );
+
+        if (entity.getEndDateTime() != null && entity.getEndMeter() != null) {
+            domain.updateEndInfo(entity.getEndDateTime(), entity.getEndMeter());
+        }
+        return domain;
     }
 
-    /** Request → Domain（新規登録用） */
+    /** Request → Domain（新規・更新どちらにも対応） */
     public static OperationRecord fromRequestToDomain(OperationRecordRequest request) {
-        return new OperationRecord(
-                null,  // 新規登録なので ID は null
+        OperationRecord domain = new OperationRecord(
+                request.getOperationRecordId(),
                 request.getVehicleId(),
                 request.getDriverId(),
                 request.getStartDateTime(),
-                request.getEndDateTime(),
-                request.getStartMeter(),
-                request.getEndMeter(),
-                request.getFuelRate()
+                request.getStartMeter()
         );
+
+        if (request.getEndDateTime() != null && request.getEndMeter() != null) {
+            domain.updateEndInfo(request.getEndDateTime(), request.getEndMeter());
+        }
+        return domain;
     }
 
     /** Domain → Response */
@@ -58,8 +61,7 @@ public class OperationRecordMapper {
                 domain.getStartDateTime(),
                 domain.getEndDateTime(),
                 domain.getStartMeter(),
-                domain.getEndMeter(),
-                domain.getFuelRate()
+                domain.getEndMeter()
         );
     }
 }
