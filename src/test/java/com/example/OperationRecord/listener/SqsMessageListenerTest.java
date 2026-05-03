@@ -80,7 +80,7 @@ public class SqsMessageListenerTest {
         verify(lineClient, times(1)).pushMessage(any(PushMessage.class));
 
         // 記録コマンドではないので reset は呼ばれない
-        verify(stepManager, never()).reset(anyString());
+        verify(stepManager, never()).resetOperationInputState(anyString());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class SqsMessageListenerTest {
         verify(flowService, never()).handleInput(anyString(), anyString());
 
         // step 初期化が呼ばれる
-        verify(stepManager, times(1)).reset("U999");
+        verify(stepManager, times(1)).resetOperationInputState("U999");
 
         // pushMessage が1回呼ばれる
         ArgumentCaptor<PushMessage> captor = ArgumentCaptor.forClass(PushMessage.class);

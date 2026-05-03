@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OperationRecordRequest {
 
+    private Long operationRecordId;
     private Long vehicleId;
     private Long driverId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Integer startMeter;
     private Integer endMeter;
-    private Double fuelRate;
 
 }

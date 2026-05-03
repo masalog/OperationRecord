@@ -27,5 +27,18 @@ public class OperationRecordApplicationServiceImpl implements OperationRecordApp
         // Domain → Response
         return OperationRecordMapper.fromDomainToResponse(saved);
     }
+
+    @Override
+    public OperationRecordResponse update(OperationRecordRequest request) {
+
+        // Request → Domain
+        OperationRecord domain = OperationRecordMapper.fromRequestToDomain(request);
+
+        // Domain を更新
+        OperationRecord updated = operationRecordService.update(domain);
+
+        // Domain → Response
+        return OperationRecordMapper.fromDomainToResponse(updated);
+    }
 }
 

@@ -4,5 +4,8 @@ import com.example.OperationRecord.dto.OperationRecordRequest;
 import com.example.OperationRecord.dto.OperationRecordResponse;
 
 public interface OperationRecordApplicationService {
+
     OperationRecordResponse register(OperationRecordRequest request);
+
+    OperationRecordResponse update(OperationRecordRequest request); 
 }

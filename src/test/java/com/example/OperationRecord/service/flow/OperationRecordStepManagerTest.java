@@ -13,44 +13,54 @@ class OperationRecordStepManagerTest {
     @Test
     void 初期ステップは1である() {
         String userId = "user1";
-        assertEquals(1, stepManager.getStep(userId));
+        assertEquals(1, stepManager.getCurrentOperationInputStep(userId));
     }
 
     @Test
     void nextStepでステップが進む() {
         String userId = "user1";
 
-        stepManager.nextStep(userId);
-        assertEquals(2, stepManager.getStep(userId));
+        stepManager.advanceOperationInputStep(userId);
+        assertEquals(2, stepManager.getCurrentOperationInputStep(userId));
 
-        stepManager.nextStep(userId);
-        assertEquals(3, stepManager.getStep(userId));
+        stepManager.advanceOperationInputStep(userId);
+        assertEquals(3, stepManager.getCurrentOperationInputStep(userId));
     }
 
     @Test
     void getFormで同じフォームが返される() {
         String userId = "user1";
 
-        OperationRecordForm form1 = stepManager.getForm(userId);
-        OperationRecordForm form2 = stepManager.getForm(userId);
+        OperationRecordForm form1 = stepManager.getOrCreateOperationInputForm(userId);
+        OperationRecordForm form2 = stepManager.getOrCreateOperationInputForm(userId);
 
         assertSame(form1, form2); // 同じインスタンスであること
     }
 
     @Test
-    void resetでステップとフォームが初期化される() {
+    void resetでステップとフォームと保存IDが初期化される() {
         String userId = "user1";
 
-        stepManager.nextStep(userId); // ステップ2へ
-        stepManager.getForm(userId).setVehicleId("10");
+        // ステップを進める
+        stepManager.advanceOperationInputStep(userId); // ステップ2へ
 
-        stepManager.reset(userId);
+        // フォームに値を入れる
+        stepManager.getOrCreateOperationInputForm(userId).setVehicleId("10");
+
+        // 保存IDを入れる
+        stepManager.storeSavedOperationRecordId(userId, 99L);
+
+        // リセット実行
+        stepManager.resetOperationInputState(userId);
 
         // ステップが1に戻る
-        assertEquals(1, stepManager.getStep(userId));
+        assertEquals(1, stepManager.getCurrentOperationInputStep(userId));
 
         // フォームが新しくなる
-        OperationRecordForm newForm = stepManager.getForm(userId);
+        OperationRecordForm newForm = stepManager.getOrCreateOperationInputForm(userId);
         assertNull(newForm.getVehicleId());
+
+        // 保存IDも消えている
+        assertNull(stepManager.getSavedOperationRecordId(userId));
     }
 }

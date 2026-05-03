@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
-import com.example.OperationRecord.mapper.OperationRecordMapper;
 import com.example.OperationRecord.repository.OperationRecordJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,88 +27,92 @@ class OperationRecordServiceImplTest {
     private OperationRecordServiceImpl service;
 
     @Test
-    void 前半保存したデータを取得できる() {
+    void 新規登録後に運行記録の番号が確定する() {
 
-        // 前半保存（終了情報は null）
+        // 前半登録用のドメイン
         OperationRecord domain = new OperationRecord(
                 null,
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
-                null,      // endDateTime
-                12000,
-                null,      // endMeter
-                null       // fuelRate
+                12000
         );
 
-        // DB に保存された後の Entity（ID が付与される）
-        OperationRecordEntity entity = new OperationRecordEntity(
+        // 保存後に番号が付与されたエンティティ
+        OperationRecordEntity savedEntity = new OperationRecordEntity(
                 1L,
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
                 null,
                 12000,
-                null,
                 null
         );
 
-        when(repository.save(any())).thenReturn(entity);
-        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        when(repository.save(any())).thenReturn(savedEntity);
+        when(repository.findById(1L)).thenReturn(Optional.of(savedEntity));
 
+        // 登録
         OperationRecord saved = service.regist(domain);
         assertNotNull(saved);
         assertEquals(1L, saved.getId());
 
+        // 取得できることも確認
         OperationRecord found = service.findById(1L);
         assertNotNull(found);
         assertEquals(1L, found.getId());
+        assertNull(found.getEndDateTime());
+        assertNull(found.getEndMeter());
     }
 
-        @Test
-        void 後半更新が正しく動く() {
+    @Test
+    void 後半更新で終了日時と終了メーターが反映される() {
 
-        // 前半保存済みのレコード（Entity）
-        OperationRecordEntity existing = new OperationRecordEntity(
+        // 既存レコード（前半のみ）
+        OperationRecordEntity existingEntity = new OperationRecordEntity(
                 1L,
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
                 null,
                 12000,
-                null,
                 null
         );
 
-        // Domain に変換
-        OperationRecord domain = OperationRecordMapper.fromEntityToDomain(existing);
-
-        // 後半情報をセット
-        domain.updateEndInfo(
-                LocalDateTime.of(2026, 4, 15, 18, 0),
-                12100,
-                165.5
+        when(repository.findById(1L)).thenReturn(Optional.of(existingEntity));
+        when(repository.save(any())).thenReturn(
+                new OperationRecordEntity(
+                        1L,
+                        1L,
+                        10L,
+                        LocalDateTime.of(2026, 4, 15, 9, 0),
+                        LocalDateTime.of(2026, 4, 15, 18, 0),
+                        12000,
+                        12100
+                )
         );
 
-        // 更新後の Entity（save が返す値）
-        OperationRecordEntity updatedEntity = new OperationRecordEntity(
+        // ドメインとして後半更新
+        OperationRecord domain = new OperationRecord(
                 1L,
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
-                LocalDateTime.of(2026, 4, 15, 18, 0),
-                12000,
-                12100,
-                165.5
+                12000
         );
 
-        // ★ findById のスタブは削除
-        when(repository.save(any())).thenReturn(updatedEntity);
+        domain.updateEndInfo(
+                LocalDateTime.of(2026, 4, 15, 18, 0),
+                12100
+        );
 
         OperationRecord updated = service.update(domain);
 
+        assertEquals(
+                LocalDateTime.of(2026, 4, 15, 18, 0),
+                updated.getEndDateTime()
+        );
         assertEquals(12100, updated.getEndMeter());
-        assertEquals(165.5, updated.getFuelRate());
-        }
-
+    }
 }
+

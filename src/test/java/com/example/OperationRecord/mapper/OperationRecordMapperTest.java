@@ -14,22 +14,21 @@ import com.example.OperationRecord.entity.OperationRecordEntity;
 class OperationRecordMapperTest {
 
     @Test
-    void DomainからEntityへ正しく変換できる() {
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
+    void ドメインをエンティティに変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+        LocalDateTime end   = LocalDateTime.of(2026, 1, 1, 12, 0);
 
         OperationRecord domain = new OperationRecord(
                 1L,
                 10L,
                 20L,
                 start,
-                end,
-                1000,
-                1200,
-                5.0
+                1000
         );
+        domain.updateEndInfo(end, 1200);
 
-        OperationRecordEntity entity = OperationRecordMapper.fromDomainToEntity(domain);
+        OperationRecordEntity entity =
+                OperationRecordMapper.fromDomainToEntity(domain);
 
         assertEquals(1L, entity.getId());
         assertEquals(10L, entity.getVehicleId());
@@ -38,13 +37,38 @@ class OperationRecordMapperTest {
         assertEquals(end, entity.getEndDateTime());
         assertEquals(1000, entity.getStartMeter());
         assertEquals(1200, entity.getEndMeter());
-        assertEquals(5.0, entity.getFuelRate());
     }
 
     @Test
-    void EntityからDomainへ正しく変換できる() {
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
+    void エンティティからドメインへ前半データを変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+
+        OperationRecordEntity entity = new OperationRecordEntity(
+                1L,
+                10L,
+                20L,
+                start,
+                null,
+                1000,
+                null
+        );
+
+        OperationRecord domain =
+                OperationRecordMapper.fromEntityToDomain(entity);
+
+        assertEquals(1L, domain.getId());
+        assertEquals(10L, domain.getVehicleId());
+        assertEquals(20L, domain.getDriverId());
+        assertEquals(start, domain.getStartDateTime());
+        assertEquals(1000, domain.getStartMeter());
+        assertNull(domain.getEndDateTime());
+        assertNull(domain.getEndMeter());
+    }
+
+    @Test
+    void エンティティからドメインへ後半データを含めて変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+        LocalDateTime end   = LocalDateTime.of(2026, 1, 1, 12, 0);
 
         OperationRecordEntity entity = new OperationRecordEntity(
                 1L,
@@ -53,74 +77,78 @@ class OperationRecordMapperTest {
                 start,
                 end,
                 1000,
-                1200,
-                5.0
+                1200
         );
 
-        OperationRecord domain = OperationRecordMapper.fromEntityToDomain(entity);
+        OperationRecord domain =
+                OperationRecordMapper.fromEntityToDomain(entity);
+
+        assertEquals(end, domain.getEndDateTime());
+        assertEquals(1200, domain.getEndMeter());
+    }
+
+    @Test
+    void リクエストからドメインへ前半登録用に変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+
+        OperationRecordRequest request = new OperationRecordRequest();
+        request.setOperationRecordId(null);
+        request.setVehicleId(10L);
+        request.setDriverId(20L);
+        request.setStartDateTime(start);
+        request.setStartMeter(1000);
+
+        OperationRecord domain =
+                OperationRecordMapper.fromRequestToDomain(request);
+
+        assertNull(domain.getId());
+        assertEquals(10L, domain.getVehicleId());
+        assertEquals(20L, domain.getDriverId());
+        assertEquals(start, domain.getStartDateTime());
+        assertEquals(1000, domain.getStartMeter());
+    }
+
+    @Test
+    void リクエストからドメインへ後半更新用に変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
+        LocalDateTime end   = LocalDateTime.of(2026, 1, 1, 12, 0);
+
+        OperationRecordRequest request = new OperationRecordRequest();
+        request.setOperationRecordId(1L);
+        request.setVehicleId(10L);
+        request.setDriverId(20L);
+        request.setStartDateTime(start);
+        request.setStartMeter(1000);
+        request.setEndDateTime(end);
+        request.setEndMeter(1200);
+
+        OperationRecord domain =
+                OperationRecordMapper.fromRequestToDomain(request);
 
         assertEquals(1L, domain.getId());
-        assertEquals(10L, domain.getVehicleId());
-        assertEquals(20L, domain.getDriverId());
-        assertEquals(start, domain.getStartDateTime());
         assertEquals(end, domain.getEndDateTime());
-        assertEquals(1000, domain.getStartMeter());
         assertEquals(1200, domain.getEndMeter());
-        assertEquals(5.0, domain.getFuelRate());
     }
 
     @Test
-    void RequestからDomainへ正しく変換できる() {
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
-
-        OperationRecordRequest request = new OperationRecordRequest(
-                10L,
-                20L,
-                start,
-                end,
-                1000,
-                1200,
-                5.0
-        );
-
-        OperationRecord domain = OperationRecordMapper.fromRequestToDomain(request);
-
-        assertNull(domain.getId()); // 新規登録なので null
-        assertEquals(10L, domain.getVehicleId());
-        assertEquals(20L, domain.getDriverId());
-        assertEquals(start, domain.getStartDateTime());
-        assertEquals(end, domain.getEndDateTime());
-        assertEquals(1000, domain.getStartMeter());
-        assertEquals(1200, domain.getEndMeter());
-        assertEquals(5.0, domain.getFuelRate());
-    }
-
-    @Test
-    void DomainからResponseへ正しく変換できる() {
-        LocalDateTime start = LocalDateTime.of(2024, 1, 1, 10, 0);
-        LocalDateTime end = LocalDateTime.of(2024, 1, 1, 12, 0);
+    void ドメインをレスポンスに変換できる() {
+        LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
 
         OperationRecord domain = new OperationRecord(
                 1L,
                 10L,
                 20L,
                 start,
-                end,
-                1000,
-                1200,
-                5.0
+                1000
         );
 
-        OperationRecordResponse response = OperationRecordMapper.fromDomainToResponse(domain);
+        OperationRecordResponse response =
+                OperationRecordMapper.fromDomainToResponse(domain);
 
         assertEquals(1L, response.getId());
         assertEquals(10L, response.getVehicleId());
         assertEquals(20L, response.getDriverId());
         assertEquals(start, response.getStartDateTime());
-        assertEquals(end, response.getEndDateTime());
         assertEquals(1000, response.getStartMeter());
-        assertEquals(1200, response.getEndMeter());
-        assertEquals(5.0, response.getFuelRate());
     }
 }

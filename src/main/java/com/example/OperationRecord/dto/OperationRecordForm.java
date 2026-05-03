@@ -35,8 +35,4 @@ public class OperationRecordForm {
     )
     private String endMeter;
 
-    // 燃費（Quick Reply / Postback で選択）
-    @NotBlank(message = "燃費を選択してください")
-    private String fuelRate;
 }
-
