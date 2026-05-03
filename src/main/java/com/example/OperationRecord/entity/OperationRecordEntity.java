@@ -41,6 +41,4 @@ public class OperationRecordEntity {
     @Column(name = "end_meter", nullable = true)       // ← 修正
     private Integer endMeter;
 
-    @Column(name = "fuel_rate", nullable = true)       // ← 修正
-    private Double fuelRate;
 }
