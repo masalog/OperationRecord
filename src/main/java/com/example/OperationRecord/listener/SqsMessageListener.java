@@ -102,7 +102,7 @@ public class SqsMessageListener {
             log.info("Received from SQS: userId={}, inputText={}", input.getUserId(), inputText);
 
             if ("記録".equals(inputText)) {
-                stepManager.reset(input.getUserId());
+                stepManager.resetOperationInputState(input.getUserId());
                 pushText(input.getUserId(), "車両IDを入力してください");
                 return true;
             }
