@@ -42,15 +42,10 @@
   - `listener/` SQS メッセージリスナー
   - `config/` AWS / LINE クライアント設定
 
-- `storage/`
-  - `schema.sql` MySQL テーブル定義
-  - `data.sql` 初期データ
-  - `docker-compose.yaml` MySQL とアプリの Docker Compose 設定
-  - `.env` 環境変数定義
-
 ## セットアップ
 
 1. Java 21 がインストールされていることを確認
 2. リポジトリのルートで Maven を実行できる状態にする
+
 
 
