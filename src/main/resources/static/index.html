@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Operation Records</title>
+</head>
+<body>
+
+<h1>Operation Records</h1>
+
+<!-- 新規登録フォーム -->
+<h2>新規登録</h2>
+<form id="createForm">
+    <label>タイトル：</label>
+    <input type="text" id="title" required>
+
+    <label>説明：</label>
+    <input type="text" id="description" required>
+
+    <button type="submit">登録</button>
+</form>
+
+<hr>
+
+<!-- 一覧表示 -->
+<h2>一覧</h2>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>タイトル</th>
+        <th>説明</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="recordTable"></tbody>
+</table>
+
+<!-- 外部 JS 読み込み -->
+<script src="/js/operation-records.js"></script>
+
+</body>
+</html>
