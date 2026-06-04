@@ -124,8 +124,3 @@ Maven でテストを実行できます。
 mvnw.cmd test
 ```
 
-## 注意事項
-
-- `storage/.env` には機密情報（LINE アクセストークン、DB パスワードなど）が含まれています。公開リポジトリに含めないよう注意してください。
-- `aws.sqs.enabled` が `true` の場合、AWS の認証情報が必要です。
-- Base URL はデフォルトで `http://localhost:8080` です。
