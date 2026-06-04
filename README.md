@@ -46,81 +46,11 @@
   - `schema.sql` MySQL テーブル定義
   - `data.sql` 初期データ
   - `docker-compose.yaml` MySQL とアプリの Docker Compose 設定
-  - `.env` 環境変数定義（機密情報が含まれるため取り扱い注意）
+  - `.env` 環境変数定義
 
 ## セットアップ
 
 1. Java 21 がインストールされていることを確認
 2. リポジトリのルートで Maven を実行できる状態にする
 
-### Maven でビルド
-
-Windows:
-```powershell
-mvnw.cmd clean package
-```
-
-Unix/macOS:
-```bash
-./mvnw clean package
-```
-
-### アプリケーション起動
-
-Windows:
-```powershell
-mvnw.cmd spring-boot:run
-```
-
-Unix/macOS:
-```bash
-./mvnw spring-boot:run
-```
-
-## Docker Compose による起動
-
-`storage/docker-compose.yaml` を使うと、MySQL とアプリをコンテナで起動できます。
-
-1. `storage/.env` に必要な環境変数を設定
-2. `storage/docker-compose.yaml` を利用してコンテナを起動
-
-```bash
-cd storage
-docker compose up -d
-```
-
-## 環境変数
-
-`storage/.env` には以下のような設定が必要です。
-
-- `SPRING_PROFILES_ACTIVE`
-- `SPRING_DATASOURCE_URL`
-- `SPRING_DATASOURCE_USERNAME`
-- `SPRING_DATASOURCE_PASSWORD`
-- `AWS_REGION`
-- `SQS_QUEUE_URL`
-- `LINE_CHANNEL_ACCESS_TOKEN`
-- `MYSQL_DATABASE`
-- `MYSQL_USER`
-- `MYSQL_PASSWORD`
-- `MYSQL_ROOT_PASSWORD`
-- `MYSQL_HOST_PORT`
-- `APP_IMAGE_NAME`
-- `APP_CONTAINER_NAME`
-- `APP_PORT`
-
-`aws.sqs.enabled=true` の場合、SQS と LINE の連携が有効になります。
-
-## データベース
-
-`storage/schema.sql` に `operation_records` テーブル定義が含まれています。
-`storage/data.sql` にサンプルデータを用意しています。
-
-## テスト
-
-Maven でテストを実行できます。
-
-```bash
-mvnw.cmd test
-```
 
