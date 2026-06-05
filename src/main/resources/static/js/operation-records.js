@@ -28,27 +28,6 @@ async function loadRecords() {
 }
 
 // ---------------------------
-// 新規登録
-// ---------------------------
-document.getElementById("createForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-        title: document.getElementById("title").value,
-        description: document.getElementById("description").value
-    };
-
-    await fetch("/operation-records", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
-
-    loadRecords();
-    e.target.reset();
-});
-
-// ---------------------------
 // 削除
 // ---------------------------
 async function deleteRecord(id) {
