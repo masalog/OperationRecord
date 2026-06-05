@@ -12,8 +12,12 @@ async function loadRecords() {
         const row = `
             <tr>
                 <td>${r.id}</td>
-                <td>${r.title}</td>
-                <td>${r.description}</td>
+                <td>${r.vehicleId}</td>
+                <td>${r.driverId}</td>
+                <td>${r.startDateTime}</td>
+                <td>${r.startMeter}</td>
+                <td>${r.endDateTime ?? ""}</td>
+                <td>${r.endMeter ?? ""}</td>
                 <td>
                     <button onclick="deleteRecord(${r.id})">削除</button>
                 </td>
