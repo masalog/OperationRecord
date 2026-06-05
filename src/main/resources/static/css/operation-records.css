@@ -1,0 +1,112 @@
+/* operation-records.css */
+
+/* 全体レイアウト */
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN", "Meiryo", sans-serif;
+    background: #f7fafc;          /* 明るいグレー寄りの背景 */
+    color: #222;                  /* 読みやすい濃いグレー文字 */
+}
+
+/* タイトル */
+h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 28px;
+    color: #1a365d;               /* 落ち着いた濃いブルー */
+}
+
+h2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #2b6cb0;
+}
+
+/* 区切り線 */
+hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 15px 0 20px;
+}
+
+/* テーブル全体 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    border-radius: 6px;
+    overflow: hidden; /* 角丸を有効にする */
+}
+
+/* テーブルヘッダー */
+thead {
+    background: linear-gradient(90deg, #4299e1, #63b3ed);
+    color: #ffffff;
+}
+
+th {
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+/* テーブルボディ */
+td {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* 交互行の背景色で見やすく */
+tbody tr:nth-child(odd) {
+    background-color: #f7fafc;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* 行ホバー時のハイライト */
+tbody tr:hover {
+    background-color: #ebf8ff;
+}
+
+/* 「操作」列のボタン風スタイルを想定 */
+td:last-child button,
+td:last-child a {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: 1px solid #3182ce;
+    background-color: #4299e1;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+td:last-child button:hover,
+td:last-child a:hover {
+    background-color: #2b6cb0;
+    transform: translateY(-1px);
+}
+
+td:last-child button:active,
+td:last-child a:active {
+    transform: translateY(0);
+}
+
+td:nth-child(1),
+td:nth-child(2),
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6) {
+    font-weight: bold;
+}
