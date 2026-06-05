@@ -12,8 +12,12 @@ async function loadRecords() {
         const row = `
             <tr>
                 <td>${r.id}</td>
-                <td>${r.title}</td>
-                <td>${r.description}</td>
+                <td>${r.vehicleId}</td>
+                <td>${r.driverId}</td>
+                <td>${r.startDateTime}</td>
+                <td>${r.startMeter}</td>
+                <td>${r.endDateTime ?? ""}</td>
+                <td>${r.endMeter ?? ""}</td>
                 <td>
                     <button onclick="deleteRecord(${r.id})">削除</button>
                 </td>
@@ -22,27 +26,6 @@ async function loadRecords() {
         tbody.insertAdjacentHTML("beforeend", row);
     });
 }
-
-// ---------------------------
-// 新規登録
-// ---------------------------
-document.getElementById("createForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-        title: document.getElementById("title").value,
-        description: document.getElementById("description").value
-    };
-
-    await fetch("/operation-records", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
-
-    loadRecords();
-    e.target.reset();
-});
 
 // ---------------------------
 // 削除

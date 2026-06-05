@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Operation Records</title>
@@ -7,18 +7,6 @@
 <body>
 
 <h1>Operation Records</h1>
-
-<!-- 新規登録フォーム -->
-<h2>新規登録</h2>
-<form id="createForm">
-    <label>タイトル：</label>
-    <input type="text" id="title" required>
-
-    <label>説明：</label>
-    <input type="text" id="description" required>
-
-    <button type="submit">登録</button>
-</form>
 
 <hr>
 
@@ -28,8 +16,12 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>タイトル</th>
-        <th>説明</th>
+        <th>車両ID</th>
+        <th>ドライバーID</th>
+        <th>開始日時</th>
+        <th>開始メーター</th>
+        <th>終了日時</th>
+        <th>終了メーター</th>
         <th>操作</th>
     </tr>
     </thead>
