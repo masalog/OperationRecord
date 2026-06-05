@@ -1,4 +1,23 @@
 // ---------------------------
+// 日時フォーマット（1/5(金) 14:30）
+// ---------------------------
+function formatDateTime(dt) {
+    if (!dt) return "";
+
+    const d = new Date(dt);
+
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+
+    const week = ["日", "月", "火", "水", "木", "金", "土"];
+    const w = week[d.getDay()];
+
+    return `${month}/${day}(${w}) ${hours}:${minutes}`;
+}
+
+// ---------------------------
 // 一覧取得
 // ---------------------------
 async function loadRecords() {
