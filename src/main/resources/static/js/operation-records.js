@@ -32,10 +32,11 @@ async function loadRecords() {
             <tr>
                 <td>${r.vehicleId}</td>
                 <td>${r.driverId}</td>
-                <td>${r.startDateTime}</td>
-                <td>${r.startMeter}</td>
-                <td>${r.endDateTime ?? ""}</td>
-                <td>${r.endMeter ?? ""}</td>
+                <td>${formatDateTime(r.startDateTime)}</td>
+                <td>${r.startMeter}km</td>
+                <td>${r.endMeter != null ? r.endMeter + "km" : ""}</td>
+                <td>${formatDateTime(r.endDateTime)}</td>
+
                 <td>
                     <button onclick="deleteRecord(${r.id})">削除</button>
                 </td>
