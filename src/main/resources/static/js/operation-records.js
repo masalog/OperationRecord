@@ -30,7 +30,6 @@ async function loadRecords() {
     records.forEach(r => {
         const row = `
             <tr>
-                <td>${r.id}</td>
                 <td>${r.vehicleId}</td>
                 <td>${r.driverId}</td>
                 <td>${r.startDateTime}</td>
