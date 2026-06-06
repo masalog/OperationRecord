@@ -75,22 +75,9 @@ class OperationRecordServiceImplTest {
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
-                null,
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000,
-                null
-        );
-
-        when(repository.findById(1L)).thenReturn(Optional.of(existingEntity));
-        when(repository.save(any())).thenReturn(
-                new OperationRecordEntity(
-                        1L,
-                        1L,
-                        10L,
-                        LocalDateTime.of(2026, 4, 15, 9, 0),
-                        LocalDateTime.of(2026, 4, 15, 18, 0),
-                        12000,
-                        12100
-                )
+                12100
         );
 
         // ドメインとして後半更新
