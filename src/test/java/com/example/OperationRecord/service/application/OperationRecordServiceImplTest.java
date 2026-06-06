@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.exception.ResourceNotFoundException;
 import com.example.OperationRecord.repository.OperationRecordJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
