@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
+import com.example.OperationRecord.exception.BadRequestException;
+
 class OperationRecordTest {
 
     @Test
