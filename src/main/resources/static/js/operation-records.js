@@ -54,15 +54,19 @@ async function loadRecords() {
     tbody.innerHTML = "";
 
     records.forEach(r => {
+        const duration = calcDuration(r.startDateTime, r.endDateTime);
+        const distance = calcDistance(r.startMeter, r.endMeter);
+
         const row = `
             <tr>
                 <td>${r.vehicleId}</td>
                 <td>${r.driverId}</td>
                 <td>${formatDateTime(r.startDateTime)}</td>
+                <td>${formatDateTime(r.endDateTime)}</td>
+                <td>${duration}</td>              <!-- 所要時間 -->
                 <td>${r.startMeter}km</td>
                 <td>${r.endMeter != null ? r.endMeter + "km" : ""}</td>
-                <td>${formatDateTime(r.endDateTime)}</td>
-
+                <td>${distance}</td>              <!-- 走行距離 -->
                 <td>
                     <button onclick="deleteRecord(${r.id})">削除</button>
                 </td>
