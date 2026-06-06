@@ -88,7 +88,7 @@ class OperationRecordTest {
     }
 
     @Test
-    void 前半生成_必須項目がnullなら例外() {
+    void 前半生成_必須項目がnullならNullPointerException() {
         assertThrows(NullPointerException.class, () -> {
             new OperationRecord(
                     1L,
