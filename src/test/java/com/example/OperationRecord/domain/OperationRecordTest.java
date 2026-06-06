@@ -48,7 +48,7 @@ class OperationRecordTest {
     }
 
     @Test
-    void updateEndInfo_開始日時より終了日時が前なら例外() {
+    void updateEndInfo_開始日時より終了日時が前ならBadRequestException() {
         OperationRecord record = new OperationRecord(
                 1L,
                 10L,
