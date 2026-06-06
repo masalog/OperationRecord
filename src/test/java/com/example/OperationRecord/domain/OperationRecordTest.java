@@ -18,7 +18,7 @@ class OperationRecordTest {
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 10, 0),
-                1000     // startMeter（前半必須）
+                1000
         );
 
         assertEquals(0, record.getDistance());
