@@ -58,8 +58,8 @@ th {
 /* テーブルボディ（フォントサイズを少し大きく） */
 td {
     padding: 10px 14px;
-    font-size: 14px;
-    border-bottom: 1px solid #ffe0b2;
+    font-size: 20px; /* ← ここだけ変更 */
+    border-bottom: 1px solid #e8dfd3;
 }
 
 /* 交互行の背景色（ベージュ系） */
