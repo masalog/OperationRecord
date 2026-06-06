@@ -94,7 +94,7 @@ td:last-child a {
 
 td:last-child button:hover,
 td:last-child a:hover {
-    background-color: #ef6c00; /* さらに濃いオレンジ */
+    background-color: #29b6f6;
     transform: scale(1.05);
 }
 
