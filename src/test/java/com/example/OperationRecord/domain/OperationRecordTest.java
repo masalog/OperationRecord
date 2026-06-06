@@ -63,6 +63,8 @@ class OperationRecordTest {
                     1100
             );
         });
+
+        assertEquals("開始日時は終了日時より前でなければならない", e.getMessage());
     }
 
     @Test
