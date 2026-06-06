@@ -82,7 +82,7 @@ class OperationRecordServiceImplTest {
 
         when(repository.save(any())).thenReturn(updatedEntity);
 
-        // ドメインとして後半更新
+        // ドメイン（前半）
         OperationRecord domain = new OperationRecord(
                 1L,
                 1L,
