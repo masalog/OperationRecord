@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
+import com.example.OperationRecord.exception.BadRequestException;
+
 class OperationRecordTest {
 
     @Test
@@ -16,7 +18,7 @@ class OperationRecordTest {
                 10L,
                 20L,
                 LocalDateTime.of(2026, 1, 1, 10, 0),
-                1000     // startMeter（前半必須）
+                1000
         );
 
         assertEquals(0, record.getDistance());
@@ -46,7 +48,7 @@ class OperationRecordTest {
     }
 
     @Test
-    void updateEndInfo_開始日時より終了日時が前なら例外() {
+    void updateEndInfo_開始日時より終了日時が前ならBadRequestException() {
         OperationRecord record = new OperationRecord(
                 1L,
                 10L,
@@ -55,16 +57,18 @@ class OperationRecordTest {
                 1000
         );
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        BadRequestException e = assertThrows(BadRequestException.class, () -> {
             record.updateEndInfo(
                     LocalDateTime.of(2026, 1, 1, 10, 0),
                     1100
             );
         });
+
+        assertEquals("開始日時は終了日時より前でなければならない", e.getMessage());
     }
 
     @Test
-    void updateEndInfo_開始メーターより終了メーターが小さいなら例外() {
+    void updateEndInfo_開始メーターより終了メーターが小さいならBadRequestException() {
         OperationRecord record = new OperationRecord(
                 1L,
                 10L,
@@ -73,16 +77,18 @@ class OperationRecordTest {
                 1200
         );
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        BadRequestException e = assertThrows(BadRequestException.class, () -> {
             record.updateEndInfo(
                     LocalDateTime.of(2026, 1, 1, 12, 0),
                     1100
             );
         });
+
+        assertEquals("開始メーターは終了メーター以下でなければならない", e.getMessage());
     }
 
     @Test
-    void 前半生成_必須項目がnullなら例外() {
+    void 前半生成_必須項目がnullならNullPointerException() {
         assertThrows(NullPointerException.class, () -> {
             new OperationRecord(
                     1L,

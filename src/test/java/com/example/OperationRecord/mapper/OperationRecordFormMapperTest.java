@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.example.OperationRecord.dto.OperationRecordForm;
 import com.example.OperationRecord.dto.OperationRecordRequest;
+import com.example.OperationRecord.exception.BadRequestException;
 
 class OperationRecordFormMapperTest {
 
@@ -62,5 +63,29 @@ class OperationRecordFormMapperTest {
         assertEquals(LocalDateTime.of(2026, 4, 18, 18, 0),
                      request.getEndDateTime());
         assertEquals(12300, request.getEndMeter());
+    }
+
+    @Test
+    void 前半保存用フォームのdriverIdが不正ならBadRequestException() {
+        OperationRecordForm form = new OperationRecordForm();
+        form.setDriverId("abc");
+        form.setVehicleId("1");
+        form.setStartDateTime("2026-04-18T09:00");
+        form.setStartMeter("1000");
+
+        assertThrows(BadRequestException.class, () -> OperationRecordFormMapper.toRegisterRequest(form));
+    }
+
+    @Test
+    void 後半更新用フォームのoperationRecordIdがnullならBadRequestException() {
+        OperationRecordForm form = new OperationRecordForm();
+        form.setDriverId("1");
+        form.setVehicleId("2");
+        form.setStartDateTime("2026-04-18T09:00");
+        form.setStartMeter("1000");
+        form.setEndDateTime("2026-04-18T18:00");
+        form.setEndMeter("1100");
+
+        assertThrows(BadRequestException.class, () -> OperationRecordFormMapper.toUpdateRequest(form, null));
     }
 }

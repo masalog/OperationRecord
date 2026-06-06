@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.exception.ResourceNotFoundException;
 import com.example.OperationRecord.repository.OperationRecordJpaRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,31 +69,20 @@ class OperationRecordServiceImplTest {
     @Test
     void 後半更新で終了日時と終了メーターが反映される() {
 
-        // 既存レコード（前半のみ）
-        OperationRecordEntity existingEntity = new OperationRecordEntity(
+        // save 後のエンティティ（後半更新後）
+        OperationRecordEntity updatedEntity = new OperationRecordEntity(
                 1L,
                 1L,
                 10L,
                 LocalDateTime.of(2026, 4, 15, 9, 0),
-                null,
+                LocalDateTime.of(2026, 4, 15, 18, 0),
                 12000,
-                null
+                12100
         );
 
-        when(repository.findById(1L)).thenReturn(Optional.of(existingEntity));
-        when(repository.save(any())).thenReturn(
-                new OperationRecordEntity(
-                        1L,
-                        1L,
-                        10L,
-                        LocalDateTime.of(2026, 4, 15, 9, 0),
-                        LocalDateTime.of(2026, 4, 15, 18, 0),
-                        12000,
-                        12100
-                )
-        );
+        when(repository.save(any())).thenReturn(updatedEntity);
 
-        // ドメインとして後半更新
+        // ドメイン（前半）
         OperationRecord domain = new OperationRecord(
                 1L,
                 1L,
@@ -101,18 +91,25 @@ class OperationRecordServiceImplTest {
                 12000
         );
 
+        // 後半情報をセット
         domain.updateEndInfo(
                 LocalDateTime.of(2026, 4, 15, 18, 0),
                 12100
         );
 
+        // 更新実行
         OperationRecord updated = service.update(domain);
 
-        assertEquals(
-                LocalDateTime.of(2026, 4, 15, 18, 0),
-                updated.getEndDateTime()
-        );
+        // 検証
+        assertEquals(LocalDateTime.of(2026, 4, 15, 18, 0), updated.getEndDateTime());
         assertEquals(12100, updated.getEndMeter());
+    }
+
+    @Test
+    void findById_存在しない場合はResourceNotFoundException() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(1L));
     }
 }
 
