@@ -104,5 +104,12 @@ class OperationRecordServiceImplTest {
         assertEquals(LocalDateTime.of(2026, 4, 15, 18, 0), updated.getEndDateTime());
         assertEquals(12100, updated.getEndMeter());
     }
+
+    @Test
+    void findById_存在しない場合はResourceNotFoundException() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.findById(1L));
+    }
 }
 
