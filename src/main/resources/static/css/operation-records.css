@@ -50,7 +50,7 @@ thead {
 th {
     padding: 12px 14px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 20px;
     text-align: left;
     border-bottom: 2px solid rgba(255, 255, 255, 0.4);
 }
@@ -82,7 +82,7 @@ td:last-child button,
 td:last-child a {
     display: inline-block;
     padding: 6px 12px;
-    font-size: 13px;
+    font-size: 20px;
     border-radius: 6px;
     border: 1px solid #fb8c00;
     background-color: #fb8c00; /* 強めのオレンジ */
