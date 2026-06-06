@@ -109,6 +109,58 @@ class OperationRecordControllerTest {
     }
 
     @Test
+    void GETで存在しないIDは404になる() throws Exception {
+
+        when(service.findById(1L)).thenThrow(new ResourceNotFoundException("Record not found: 1"));
+
+        mockMvc.perform(get("/operation-records/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Record not found: 1"))
+                .andExpect(jsonPath("$.path").value("/operation-records/1"));
+
+        verify(service).findById(1L);
+    }
+
+    @Test
+    void POSTでBadRequestExceptionが返る() throws Exception {
+
+        when(service.regist(any())).thenThrow(new BadRequestException("invalid request"));
+
+        mockMvc.perform(post("/operation-records")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "vehicleId": 1,
+                        "driverId": 10,
+                        "startDateTime": "2026-04-15T09:00:00",
+                        "startMeter": 12000
+                    }
+                    """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("invalid request"));
+
+        verify(service).regist(any());
+    }
+
+    @Test
+    void GETで内部エラーなら500になる() throws Exception {
+
+        when(service.findById(1L)).thenThrow(new RuntimeException("unexpected"));
+
+        mockMvc.perform(get("/operation-records/1"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.message").value("Internal server error"));
+
+        verify(service).findById(1L);
+    }
+
+    @Test
     void DELETEで削除できる() throws Exception {
 
         mockMvc.perform(delete("/operation-records/1"))
