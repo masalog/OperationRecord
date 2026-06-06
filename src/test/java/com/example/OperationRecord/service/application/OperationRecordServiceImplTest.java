@@ -100,10 +100,8 @@ class OperationRecordServiceImplTest {
         // 更新実行
         OperationRecord updated = service.update(domain);
 
-        assertEquals(
-                LocalDateTime.of(2026, 4, 15, 18, 0),
-                updated.getEndDateTime()
-        );
+        // 検証
+        assertEquals(LocalDateTime.of(2026, 4, 15, 18, 0), updated.getEndDateTime());
         assertEquals(12100, updated.getEndMeter());
     }
 }
