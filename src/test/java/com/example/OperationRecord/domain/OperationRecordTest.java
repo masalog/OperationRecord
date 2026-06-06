@@ -77,7 +77,7 @@ class OperationRecordTest {
                 1200
         );
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        BadRequestException e = assertThrows(BadRequestException.class, () -> {
             record.updateEndInfo(
                     LocalDateTime.of(2026, 1, 1, 12, 0),
                     1100
