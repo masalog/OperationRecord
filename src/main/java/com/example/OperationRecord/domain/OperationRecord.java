@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.example.OperationRecord.exception.BadRequestException;
+
 import lombok.Getter;
 
 @Getter
