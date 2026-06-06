@@ -46,7 +46,7 @@ public class OperationRecord {
         Objects.requireNonNull(endMeter, "endMeter must not be null");
 
         if (startDateTime.isAfter(endDateTime)) {
-            throw new IllegalArgumentException("開始日時は終了日時より前でなければならない");
+            throw new BadRequestException("開始日時は終了日時より前でなければならない");
         }
         if (startMeter > endMeter) {
             throw new IllegalArgumentException("開始メーターは終了メーター以下でなければならない");
