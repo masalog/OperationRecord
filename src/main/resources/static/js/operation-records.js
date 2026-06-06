@@ -18,6 +18,32 @@ function formatDateTime(dt) {
 }
 
 // ---------------------------
+// 所要時間（発車→到着）
+// ---------------------------
+function calcDuration(start, end) {
+    if (!start || !end) return "";
+
+    const s = new Date(start);
+    const e = new Date(end);
+    const diff = e - s;
+
+    if (isNaN(diff)) return "";
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${hours}時間${minutes}分`;
+}
+
+// ---------------------------
+// 走行距離（メーター差）
+// ---------------------------
+function calcDistance(startMeter, endMeter) {
+    if (startMeter == null || endMeter == null) return "";
+    return (endMeter - startMeter) + "km";
+}
+
+// ---------------------------
 // 一覧取得
 // ---------------------------
 async function loadRecords() {
