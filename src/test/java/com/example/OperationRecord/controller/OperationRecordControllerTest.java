@@ -17,6 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.example.OperationRecord.domain.OperationRecord;
+import com.example.OperationRecord.exception.BadRequestException;
+import com.example.OperationRecord.exception.GlobalExceptionHandler;
+import com.example.OperationRecord.exception.ResourceNotFoundException;
 import com.example.OperationRecord.service.application.OperationRecordService;
 
 class OperationRecordControllerTest {
