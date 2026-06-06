@@ -48,7 +48,7 @@ public class OperationRecordServiceImpl implements OperationRecordService {
     public OperationRecord findById(Long id) {
         return repository.findById(id)
                 .map(OperationRecordMapper::fromEntityToDomain)
-                .orElseThrow(() -> new RuntimeException("Record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found: " + id));
     }
 
     @Override
