@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.OperationRecord.domain.OperationRecord;
 import com.example.OperationRecord.entity.OperationRecordEntity;
+import com.example.OperationRecord.exception.ResourceNotFoundException;
 import com.example.OperationRecord.mapper.OperationRecordMapper;
 import com.example.OperationRecord.repository.OperationRecordJpaRepository;
 
