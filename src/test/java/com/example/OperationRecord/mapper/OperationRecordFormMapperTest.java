@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.example.OperationRecord.dto.OperationRecordForm;
 import com.example.OperationRecord.dto.OperationRecordRequest;
+import com.example.OperationRecord.exception.BadRequestException;
 
 class OperationRecordFormMapperTest {
 
