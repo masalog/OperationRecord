@@ -32,6 +32,7 @@ class OperationRecordControllerTest {
         service = Mockito.mock(OperationRecordService.class);
         mockMvc = MockMvcBuilders
                 .standaloneSetup(new OperationRecordController(service))
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
