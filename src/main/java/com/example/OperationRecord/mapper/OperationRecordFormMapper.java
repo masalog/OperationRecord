@@ -52,7 +52,7 @@ public class OperationRecordFormMapper {
         String normalized = normalizeDigits(v);
 
         if (!normalized.matches("\\d+")) {
-            throw new IllegalArgumentException(fieldName + " must be numeric: " + normalized);
+            throw new BadRequestException(fieldName + " must be numeric: " + normalized);
         }
 
         try {
