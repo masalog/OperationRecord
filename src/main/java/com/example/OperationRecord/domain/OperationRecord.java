@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.example.OperationRecord.exception.BadRequestException;
+
 import lombok.Getter;
 
 @Getter
@@ -44,10 +46,10 @@ public class OperationRecord {
         Objects.requireNonNull(endMeter, "endMeter must not be null");
 
         if (startDateTime.isAfter(endDateTime)) {
-            throw new IllegalArgumentException("開始日時は終了日時より前でなければならない");
+            throw new BadRequestException("開始日時は終了日時より前でなければならない");
         }
         if (startMeter > endMeter) {
-            throw new IllegalArgumentException("開始メーターは終了メーター以下でなければならない");
+            throw new BadRequestException("開始メーターは終了メーター以下でなければならない");
         }
 
         this.endDateTime = endDateTime;

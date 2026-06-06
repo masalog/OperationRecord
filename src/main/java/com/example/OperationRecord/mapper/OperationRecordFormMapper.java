@@ -7,13 +7,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import com.example.OperationRecord.exception.BadRequestException;
+
 public class OperationRecordFormMapper {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     private static String requireText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " is null/blank");
+            throw new BadRequestException(fieldName + " is null/blank");
         }
         return value.trim();
     }
@@ -23,7 +25,7 @@ public class OperationRecordFormMapper {
         try {
             return LocalDateTime.parse(v, FORMATTER);
         } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException(fieldName + " format is invalid: " + v, ex);
+            throw new BadRequestException(fieldName + " format is invalid: " + v, ex);
         }
     }
 
@@ -50,13 +52,13 @@ public class OperationRecordFormMapper {
         String normalized = normalizeDigits(v);
 
         if (!normalized.matches("\\d+")) {
-            throw new IllegalArgumentException(fieldName + " must be numeric: " + normalized);
+            throw new BadRequestException(fieldName + " must be numeric: " + normalized);
         }
 
         try {
             return Long.parseLong(normalized);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(fieldName + " is out of range: " + normalized, ex);
+            throw new BadRequestException(fieldName + " is out of range: " + normalized, ex);
         }
     }
 
@@ -68,13 +70,13 @@ public class OperationRecordFormMapper {
         String normalized = normalizeDigits(v);
 
         if (!normalized.matches("\\d+")) {
-            throw new IllegalArgumentException(fieldName + " must be numeric: " + normalized);
+            throw new BadRequestException(fieldName + " must be numeric: " + normalized);
         }
 
         try {
             return Integer.parseInt(normalized);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(fieldName + " is out of range: " + normalized, ex);
+            throw new BadRequestException(fieldName + " is out of range: " + normalized, ex);
         }
     }
 
@@ -105,8 +107,8 @@ public class OperationRecordFormMapper {
      * startMeter は前半で入力済みの値をフォームからコピーして載せる
      */
     public static OperationRecordRequest toUpdateRequest(OperationRecordForm form, Long operationRecordId) {
-        if (form == null) throw new IllegalArgumentException("form is null");
-        if (operationRecordId == null) throw new IllegalArgumentException("operationRecordId is null");
+        if (form == null) throw new BadRequestException("form is null");
+        if (operationRecordId == null) throw new BadRequestException("operationRecordId is null");
 
         OperationRecordRequest req = new OperationRecordRequest();
         req.setOperationRecordId(operationRecordId);
