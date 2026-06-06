@@ -91,11 +91,13 @@ class OperationRecordServiceImplTest {
                 12000
         );
 
+        // 後半情報をセット
         domain.updateEndInfo(
                 LocalDateTime.of(2026, 4, 15, 18, 0),
                 12100
         );
 
+        // 更新実行
         OperationRecord updated = service.update(domain);
 
         assertEquals(
