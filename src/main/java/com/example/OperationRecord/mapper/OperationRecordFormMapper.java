@@ -15,7 +15,7 @@ public class OperationRecordFormMapper {
 
     private static String requireText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " is null/blank");
+            throw new BadRequestException(fieldName + " is null/blank");
         }
         return value.trim();
     }
