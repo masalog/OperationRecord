@@ -80,6 +80,8 @@ class OperationRecordServiceImplTest {
                 12100
         );
 
+        when(repository.save(any())).thenReturn(updatedEntity);
+
         // ドメインとして後半更新
         OperationRecord domain = new OperationRecord(
                 1L,
