@@ -68,7 +68,7 @@ class OperationRecordTest {
     }
 
     @Test
-    void updateEndInfo_開始メーターより終了メーターが小さいなら例外() {
+    void updateEndInfo_開始メーターより終了メーターが小さいならBadRequestException() {
         OperationRecord record = new OperationRecord(
                 1L,
                 10L,
