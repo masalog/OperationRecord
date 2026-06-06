@@ -9,7 +9,7 @@ body {
     color: #222;
 }
 
-/* タイトル */
+/* タイトル（ベージュ系） */
 h1 {
     margin-top: 0;
     margin-bottom: 10px;
@@ -24,7 +24,7 @@ h2 {
     color: #fb8c00; /* 青をサブに */
 }
 
-/* 区切り線 */
+/* 区切り線（ベージュ系） */
 hr {
     border: none;
     border-top: 3px solid #e0d4c2;
@@ -41,7 +41,7 @@ table {
     overflow: hidden;
 }
 
-/* テーブルヘッダー（青を維持） */
+/* テーブルヘッダー（ブルー系を維持） */
 thead {
     background: linear-gradient(90deg, #1e88e5, #42a5f5);
     color: #ffffff;
@@ -55,14 +55,14 @@ th {
     border-bottom: 2px solid rgba(255, 255, 255, 0.4);
 }
 
-/* テーブルボディ */
+/* テーブルボディ（フォントサイズを少し大きく） */
 td {
     padding: 10px 14px;
     font-size: 14px;
     border-bottom: 1px solid #ffe0b2;
 }
 
-/* 交互行の背景色（オレンジ寄りに） */
+/* 交互行の背景色（ベージュ系） */
 tbody tr:nth-child(odd) {
     background-color: #f5efe4;
 }
@@ -71,13 +71,13 @@ tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 
-/* 行ホバー時のハイライト（オレンジ強め） */
+/* 行ホバー時のハイライト（濃いベージュ） */
 tbody tr:hover {
     background-color: #e8dfd3;
     transition: background-color 0.2s ease;
 }
 
-/* 操作ボタン（オレンジを主役に） */
+/* 操作ボタン（水色系） */
 td:last-child button,
 td:last-child a {
     display: inline-block;
