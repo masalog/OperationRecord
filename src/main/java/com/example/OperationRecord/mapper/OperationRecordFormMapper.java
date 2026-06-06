@@ -25,7 +25,7 @@ public class OperationRecordFormMapper {
         try {
             return LocalDateTime.parse(v, FORMATTER);
         } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException(fieldName + " format is invalid: " + v, ex);
+            throw new BadRequestException(fieldName + " format is invalid: " + v, ex);
         }
     }
 
