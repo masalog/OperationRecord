@@ -69,8 +69,8 @@ class OperationRecordServiceImplTest {
     @Test
     void 後半更新で終了日時と終了メーターが反映される() {
 
-        // 既存レコード（前半のみ）
-        OperationRecordEntity existingEntity = new OperationRecordEntity(
+        // save 後のエンティティ（後半更新後）
+        OperationRecordEntity updatedEntity = new OperationRecordEntity(
                 1L,
                 1L,
                 10L,
