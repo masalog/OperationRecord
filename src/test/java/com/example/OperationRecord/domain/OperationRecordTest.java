@@ -83,6 +83,8 @@ class OperationRecordTest {
                     1100
             );
         });
+
+        assertEquals("開始メーターは終了メーター以下でなければならない", e.getMessage());
     }
 
     @Test
