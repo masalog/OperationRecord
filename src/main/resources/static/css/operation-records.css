@@ -5,7 +5,7 @@ body {
     margin: 0;
     padding: 20px;
     font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "ヒラギノ角ゴ ProN", "Meiryo", sans-serif;
-    background: #fff3e0; /* オレンジ寄りの明るい背景 */
+    background: #f7f3e9; /* ベージュ系の明るい背景 */
     color: #222;
 }
 
@@ -14,7 +14,7 @@ h1 {
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 30px;
-    color: #fb8c00; /* メインをオレンジに */
+    color: #c49a6c; /* ベージュブラウン */
 }
 
 h2 {
@@ -27,7 +27,7 @@ h2 {
 /* 区切り線 */
 hr {
     border: none;
-    border-top: 3px solid #ffcc80; /* オレンジ系 */
+    border-top: 3px solid #e0d4c2;
     margin: 15px 0 20px;
 }
 
@@ -36,7 +36,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: #ffffff;
-    box-shadow: 0 4px 10px rgba(251, 140, 0, 0.25); /* オレンジ影 */
+    box-shadow: 0 4px 10px rgba(196, 154, 108, 0.25); /* ベージュ影 */
     border-radius: 8px;
     overflow: hidden;
 }
@@ -64,7 +64,7 @@ td {
 
 /* 交互行の背景色（オレンジ寄りに） */
 tbody tr:nth-child(odd) {
-    background-color: #fff8e1; /* 薄いオレンジ */
+    background-color: #f5efe4;
 }
 
 tbody tr:nth-child(even) {
@@ -73,7 +73,7 @@ tbody tr:nth-child(even) {
 
 /* 行ホバー時のハイライト（オレンジ強め） */
 tbody tr:hover {
-    background-color: #ffe0b2;
+    background-color: #e8dfd3;
     transition: background-color 0.2s ease;
 }
 
